@@ -13,7 +13,7 @@ The platform enables graduates and students of a university to connect, share ex
 - 🔍 Explore opportunities from top companies
 - 🏫 University-based community structure
 
-## (Purpose)
+## Purpose
 
 AlumniConnect aims to bridge the gap between education and industry by creating a trusted network where students can access real-world opportunities through alumni connections.
 
