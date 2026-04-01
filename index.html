@@ -5,109 +5,124 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Yapım Aşamasında</title>
 
-<!-- Google Font -->
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
 
 <style>
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: 'Montserrat', sans-serif;
+    font-family: 'Poppins', sans-serif;
 }
 
 body {
     height: 100vh;
-    background: url('https://images.unsplash.com/photo-1492724441997-5dc865305da7') no-repeat center center/cover;
+    background: linear-gradient(135deg, #1e1e2f, #3a3a60);
     display: flex;
     justify-content: center;
     align-items: center;
     color: white;
+    overflow: hidden;
 }
 
-/* Blur overlay */
-.overlay {
+/* Background glow */
+body::before {
+    content: "";
     position: absolute;
-    width: 100%;
-    height: 100%;
-    backdrop-filter: blur(8px);
-    background: rgba(0,0,0,0.5);
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, #4da6ff55, transparent 70%);
+    top: -100px;
+    left: -100px;
 }
 
-/* Container */
+/* Glass container */
 .container {
-    position: relative;
+    backdrop-filter: blur(15px);
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    padding: 50px 40px;
+    border-radius: 20px;
     text-align: center;
-    z-index: 2;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+    max-width: 400px;
+    width: 90%;
 }
 
 /* Title */
 h1 {
-    font-size: 60px;
-    letter-spacing: 5px;
+    font-size: 42px;
+    letter-spacing: 3px;
     margin-bottom: 10px;
 }
 
 .subtitle {
-    font-size: 14px;
-    letter-spacing: 3px;
+    font-size: 13px;
+    letter-spacing: 2px;
+    opacity: 0.7;
     margin-bottom: 30px;
-    opacity: 0.8;
 }
 
-/* Progress bar */
+/* Progress */
 .progress-container {
-    width: 300px;
-    height: 6px;
-    background: rgba(255,255,255,0.2);
-    border-radius: 10px;
-    margin: 0 auto 10px;
+    width: 100%;
+    height: 8px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 20px;
+    overflow: hidden;
+    margin-bottom: 10px;
 }
 
 .progress-bar {
-    width: 60%;
     height: 100%;
-    background: #4da6ff;
-    border-radius: 10px;
+    width: 0%;
+    background: linear-gradient(90deg, #4da6ff, #7f5cff);
+    animation: load 3s ease forwards;
+}
+
+@keyframes load {
+    from { width: 0; }
+    to { width: 75%; }
 }
 
 /* Button */
 button {
     margin-top: 20px;
-    padding: 10px 20px;
+    padding: 12px 25px;
     border: none;
-    background: #4da6ff;
+    background: linear-gradient(135deg, #4da6ff, #7f5cff);
     color: white;
     cursor: pointer;
-    border-radius: 5px;
+    border-radius: 30px;
+    font-size: 14px;
+    transition: 0.3s;
 }
 
 button:hover {
-    background: #3399ff;
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(77,166,255,0.4);
 }
 
-/* Social icons */
+/* Social */
 .social {
-    margin-top: 40px;
+    margin-top: 30px;
 }
 
 .social a {
     display: inline-block;
-    width: 45px;
-    height: 45px;
-    line-height: 45px;
+    width: 42px;
+    height: 42px;
+    line-height: 42px;
     margin: 5px;
-    border: 1px solid white;
     border-radius: 50%;
-    text-align: center;
+    background: rgba(255,255,255,0.08);
     color: white;
     text-decoration: none;
     transition: 0.3s;
 }
 
 .social a:hover {
-    background: white;
-    color: black;
+    background: linear-gradient(135deg, #4da6ff, #7f5cff);
 }
 
 /* Footer */
@@ -115,19 +130,15 @@ footer {
     position: absolute;
     bottom: 20px;
     font-size: 12px;
-    opacity: 0.7;
-    text-align: center;
-    width: 100%;
+    opacity: 0.5;
 }
 </style>
 </head>
 
 <body>
 
-<div class="overlay"></div>
-
 <div class="container">
-    <h1>UNDER<br>CONSTRUCTION</h1>
+    <h1>UNDER CONSTRUCTION</h1>
     <div class="subtitle">SITE YAKINDA HAZIR</div>
 
     <div class="progress-container">
