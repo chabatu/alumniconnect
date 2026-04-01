@@ -1,0 +1,1552 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AlumniConnect — AI Kariyer Platformu</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink:#0f0e0c; --paper:#faf8f4; --cream:#f2ede4;
+  --accent:#c8a96e; --accent-dark:#9a7a42;
+  --teal:#1a6b5a; --teal-light:#e8f5f1;
+  --coral:#c44d3a; --coral-light:#fdf0ee;
+  --muted:#7a7469; --border:#e0d9cf; --card:#ffffff;
+  --shadow:0 1px 3px rgba(15,14,12,.08),0 4px 16px rgba(15,14,12,.04);
+  --shadow-lg:0 8px 32px rgba(15,14,12,.12);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:var(--paper);color:var(--ink);min-height:100vh;font-size:15px;line-height:1.6}
+::-webkit-scrollbar{width:5px} ::-webkit-scrollbar-track{background:transparent} ::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+
+/* ── PORTAL SCREEN ── */
+#portalScreen{position:fixed;inset:0;z-index:1000;background:var(--ink);display:flex;align-items:center;justify-content:center;animation:fadeIn .4s ease}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes slideUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+.portal-box{width:100%;max-width:440px;padding:24px;animation:slideUp .4s ease}
+.portal-logo{font-family:'DM Serif Display',serif;font-size:32px;color:white;text-align:center;margin-bottom:6px}
+.portal-logo span{color:var(--accent)}
+.portal-tagline{text-align:center;color:rgba(255,255,255,.5);font-size:13px;margin-bottom:32px}
+
+.portal-type-row{display:flex;gap:8px;margin-bottom:24px;background:rgba(255,255,255,.07);border-radius:12px;padding:4px}
+.ptype-btn{flex:1;padding:10px;border-radius:9px;font-size:13px;font-weight:500;cursor:pointer;border:none;background:transparent;color:rgba(255,255,255,.5);transition:all .2s;font-family:'DM Sans',sans-serif}
+.ptype-btn.active{background:rgba(255,255,255,.12);color:white}
+
+.portal-card{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:16px;padding:28px}
+.portal-tabs{display:flex;gap:0;margin-bottom:24px;border-bottom:1px solid rgba(255,255,255,.1)}
+.ptab{flex:1;padding:10px;font-size:13px;font-weight:500;cursor:pointer;border:none;background:transparent;color:rgba(255,255,255,.4);transition:all .2s;font-family:'DM Sans',sans-serif;border-bottom:2px solid transparent;margin-bottom:-1px}
+.ptab.active{color:var(--accent);border-bottom-color:var(--accent)}
+
+.portal-form{display:flex;flex-direction:column;gap:14px}
+.pform-group{display:flex;flex-direction:column;gap:5px}
+.pform-label{font-size:12px;color:rgba(255,255,255,.5);font-weight:500}
+.pform-input{padding:10px 14px;border-radius:9px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.07);color:white;font-size:14px;font-family:'DM Sans',sans-serif;outline:none;transition:border-color .2s}
+.pform-input::placeholder{color:rgba(255,255,255,.25)}
+.pform-input:focus{border-color:var(--accent)}
+.pform-select{padding:10px 14px;border-radius:9px;border:1px solid rgba(255,255,255,.12);background:rgba(30,28,25,1);color:white;font-size:14px;font-family:'DM Sans',sans-serif;outline:none}
+.pform-select option{background:#1e1c19}
+
+.portal-submit{padding:12px;border-radius:9px;background:var(--accent);color:white;font-size:14px;font-weight:600;cursor:pointer;border:none;font-family:'DM Sans',sans-serif;transition:all .2s;margin-top:4px}
+.portal-submit:hover{background:var(--accent-dark);transform:translateY(-1px)}
+.portal-err{font-size:12px;color:#f09595;text-align:center;min-height:16px}
+.portal-demo{text-align:center;margin-top:16px;font-size:12px;color:rgba(255,255,255,.3)}
+.portal-demo span{color:var(--accent);cursor:pointer}
+.portal-demo span:hover{text-decoration:underline}
+
+/* ── APP SHELL ── */
+.app{display:flex;flex-direction:column;min-height:100vh}
+nav{background:var(--paper);border-bottom:1px solid var(--border);padding:0 32px;height:60px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.nav-logo{font-family:'DM Serif Display',serif;font-size:22px;color:var(--ink);letter-spacing:-.3px;cursor:pointer}
+.nav-logo span{color:var(--accent)}
+.nav-tabs{display:flex;gap:4px;background:var(--cream);border-radius:10px;padding:4px;border:1px solid var(--border)}
+.nav-tab{padding:6px 16px;border-radius:7px;font-size:13px;font-weight:500;cursor:pointer;color:var(--muted);border:none;background:transparent;transition:all .2s;font-family:'DM Sans',sans-serif}
+.nav-tab.active{background:var(--card);color:var(--ink);box-shadow:0 1px 4px rgba(0,0,0,.1)}
+.nav-tab:hover:not(.active){color:var(--ink)}
+.nav-right{display:flex;align-items:center;gap:12px}
+
+.lang-toggle{display:flex;align-items:center;background:var(--cream);border:1px solid var(--border);border-radius:20px;padding:3px;gap:2px}
+.lang-btn{padding:4px 10px;border-radius:16px;font-size:12px;font-weight:600;cursor:pointer;border:none;background:transparent;color:var(--muted);transition:all .2s;font-family:'DM Sans',sans-serif;letter-spacing:.3px}
+.lang-btn.active{background:var(--ink);color:white}
+.lang-btn:hover:not(.active){color:var(--ink)}
+
+.user-pill{display:flex;align-items:center;gap:8px;background:var(--cream);border:1px solid var(--border);border-radius:20px;padding:4px 12px 4px 4px;font-size:13px;cursor:pointer;transition:all .2s}
+.user-pill:hover{border-color:var(--accent)}
+.avatar{width:28px;height:28px;border-radius:50%;background:var(--accent);color:white;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600}
+.company-pill-badge{font-size:10px;padding:1px 6px;border-radius:10px;background:var(--teal-light);color:var(--teal);font-weight:600;margin-left:4px}
+
+/* ── PAGES ── */
+.page{display:none;flex:1;flex-direction:column}
+.page.active{display:flex}
+
+/* ── HOME ── */
+.home-hero{background:var(--ink);color:white;padding:64px 48px;position:relative;overflow:hidden}
+.home-hero::before{content:'';position:absolute;top:-80px;right:-80px;width:320px;height:320px;border-radius:50%;background:rgba(200,169,110,.12)}
+.home-hero::after{content:'';position:absolute;bottom:-60px;left:-40px;width:240px;height:240px;border-radius:50%;background:rgba(26,107,90,.15)}
+.hero-inner{position:relative;z-index:1;max-width:680px}
+.hero-tag{display:inline-flex;align-items:center;gap:6px;background:rgba(200,169,110,.2);border:1px solid rgba(200,169,110,.4);border-radius:20px;padding:4px 12px;font-size:12px;color:var(--accent);margin-bottom:20px;letter-spacing:.5px;font-weight:500}
+.hero-tag::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--accent)}
+.hero-title{font-family:'DM Serif Display',serif;font-size:42px;line-height:1.15;margin-bottom:16px;letter-spacing:-.5px}
+.hero-title em{color:var(--accent);font-style:italic}
+.hero-sub{font-size:16px;color:rgba(255,255,255,.65);margin-bottom:32px;max-width:480px;line-height:1.7}
+.hero-btns{display:flex;gap:12px;flex-wrap:wrap}
+.btn{padding:10px 22px;border-radius:8px;font-size:14px;font-weight:500;cursor:pointer;border:none;transition:all .2s;font-family:'DM Sans',sans-serif}
+.btn-primary{background:var(--accent);color:white}
+.btn-primary:hover{background:var(--accent-dark);transform:translateY(-1px)}
+.btn-outline{background:transparent;color:white;border:1px solid rgba(255,255,255,.25)}
+.btn-outline:hover{background:rgba(255,255,255,.08)}
+.home-content{padding:40px 48px;flex:1}
+.section-title{font-family:'DM Serif Display',serif;font-size:24px;margin-bottom:20px;letter-spacing:-.3px}
+.stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:40px}
+.stat-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;text-align:center;box-shadow:var(--shadow)}
+.stat-num{font-family:'DM Serif Display',serif;font-size:36px;color:var(--accent);margin-bottom:4px}
+.stat-lbl{font-size:13px;color:var(--muted)}
+.alumni-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;margin-bottom:40px}
+.alumni-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;box-shadow:var(--shadow);transition:all .2s;cursor:pointer}
+.alumni-card:hover{transform:translateY(-2px);box-shadow:var(--shadow-lg);border-color:var(--accent)}
+.alumni-card-top{display:flex;gap:12px;align-items:flex-start;margin-bottom:12px}
+.alumni-avatar{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:16px;flex-shrink:0;color:white}
+.alumni-name{font-weight:600;font-size:15px;margin-bottom:2px}
+.alumni-role{font-size:12px;color:var(--muted)}
+.alumni-company{font-size:13px;color:var(--teal);font-weight:500;margin-bottom:10px}
+.alumni-tags{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:14px}
+.tag{font-size:11px;padding:2px 8px;border-radius:20px;background:var(--cream);border:1px solid var(--border);color:var(--muted)}
+.match-badge{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;padding:3px 8px;border-radius:20px}
+.match-high{background:#e8f5f1;color:var(--teal)}
+.match-med{background:#faeeda;color:#854F0B}
+.btn-sm{padding:6px 14px;border-radius:7px;font-size:12px;font-weight:500;cursor:pointer;border:1px solid var(--border);background:var(--cream);color:var(--ink);transition:all .2s;font-family:'DM Sans',sans-serif}
+.btn-sm:hover{background:var(--accent);color:white;border-color:var(--accent)}
+.card-footer{display:flex;justify-content:space-between;align-items:center}
+
+/* ── JOBS PAGE ── */
+.jobs-layout{display:flex;flex:1;overflow:hidden;height:calc(100vh - 60px)}
+.jobs-sidebar{width:300px;border-right:1px solid var(--border);background:var(--card);display:flex;flex-direction:column;flex-shrink:0;overflow-y:auto}
+.jobs-sidebar-header{padding:20px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--card);z-index:10}
+.jobs-search{width:100%;padding:8px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;font-family:'DM Sans',sans-serif;background:var(--paper);color:var(--ink);outline:none;margin-bottom:10px}
+.jobs-search:focus{border-color:var(--accent)}
+.jobs-filter-row{display:flex;gap:6px;flex-wrap:wrap}
+.filter-chip{font-size:11px;padding:3px 10px;border-radius:20px;border:1px solid var(--border);background:var(--cream);color:var(--muted);cursor:pointer;transition:all .2s;font-family:'DM Sans',sans-serif}
+.filter-chip.active{background:var(--ink);color:white;border-color:var(--ink)}
+.job-list-item{padding:16px 20px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .15s}
+.job-list-item:hover{background:var(--cream)}
+.job-list-item.active{background:var(--cream);border-left:3px solid var(--accent)}
+.jli-company{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.company-logo{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;color:white;flex-shrink:0}
+.jli-company-name{font-size:12px;color:var(--muted)}
+.jli-title{font-size:14px;font-weight:600;margin-bottom:4px}
+.jli-meta{display:flex;gap:8px;flex-wrap:wrap}
+.jli-tag{font-size:11px;padding:2px 7px;border-radius:20px}
+.jt-type{background:var(--teal-light);color:var(--teal)}
+.jt-loc{background:var(--cream);color:var(--muted)}
+.jt-new{background:#FAEEDA;color:#854F0B}
+
+.job-detail{flex:1;overflow-y:auto;padding:32px;background:var(--paper)}
+.job-detail-empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--muted);gap:12px}
+.job-detail-header{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:28px;margin-bottom:20px;box-shadow:var(--shadow)}
+.jdh-top{display:flex;align-items:flex-start;gap:16px;margin-bottom:16px}
+.company-logo-lg{width:56px;height:56px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:20px;color:white;flex-shrink:0}
+.jdh-title{font-family:'DM Serif Display',serif;font-size:24px;margin-bottom:4px}
+.jdh-company{font-size:15px;color:var(--teal);font-weight:500;margin-bottom:8px}
+.jdh-tags{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.jdh-tag{font-size:12px;padding:4px 12px;border-radius:20px;border:1px solid var(--border)}
+.jt-salary{background:var(--teal-light);color:var(--teal)}
+.jt-dept{background:var(--cream);color:var(--muted)}
+.jdh-actions{display:flex;gap:10px}
+.btn-apply{padding:10px 24px;border-radius:9px;background:var(--ink);color:white;font-size:14px;font-weight:600;cursor:pointer;border:none;font-family:'DM Sans',sans-serif;transition:all .2s}
+.btn-apply:hover{background:var(--accent);transform:translateY(-1px)}
+.btn-contact{padding:10px 20px;border-radius:9px;background:transparent;color:var(--ink);font-size:14px;font-weight:500;cursor:pointer;border:1px solid var(--border);font-family:'DM Sans',sans-serif;transition:all .2s}
+.btn-contact:hover{border-color:var(--accent);color:var(--accent)}
+
+.job-section{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:24px;margin-bottom:16px;box-shadow:var(--shadow)}
+.job-section h3{font-family:'DM Serif Display',serif;font-size:18px;margin-bottom:14px}
+.job-section p{font-size:14px;color:var(--muted);line-height:1.7;margin-bottom:10px}
+.job-section ul{padding-left:18px}
+.job-section li{font-size:14px;color:var(--muted);line-height:1.7;margin-bottom:4px}
+.poster-card{display:flex;gap:12px;align-items:center;background:var(--cream);border-radius:10px;padding:14px}
+.poster-info .pname{font-weight:600;font-size:14px}
+.poster-info .prole{font-size:12px;color:var(--muted)}
+.poster-info .palumni{font-size:11px;color:var(--teal);font-weight:500}
+
+/* ── AI CHAT ── */
+.chat-layout{display:flex;flex:1;overflow:hidden;height:calc(100vh - 60px)}
+.chat-sidebar{width:260px;border-right:1px solid var(--border);background:var(--card);display:flex;flex-direction:column;flex-shrink:0}
+.sidebar-header{padding:20px;border-bottom:1px solid var(--border)}
+.sidebar-title{font-family:'DM Serif Display',serif;font-size:17px;margin-bottom:4px}
+.sidebar-sub{font-size:12px;color:var(--muted)}
+.sidebar-options{padding:12px;flex:1;overflow-y:auto}
+.option-item{padding:10px 12px;border-radius:8px;cursor:pointer;transition:all .15s;margin-bottom:2px;border:1px solid transparent}
+.option-item:hover{background:var(--cream)}
+.option-item.active{background:var(--cream);border-color:var(--border)}
+.option-title{font-size:13px;font-weight:500;margin-bottom:2px}
+.option-sub{font-size:11px;color:var(--muted)}
+.chat-main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.chat-header{padding:16px 24px;border-bottom:1px solid var(--border);background:var(--card);display:flex;align-items:center;gap:12px}
+.chat-icon{width:36px;height:36px;border-radius:10px;background:var(--ink);display:flex;align-items:center;justify-content:center;font-size:16px}
+.chat-header-text .ch-title{font-weight:600;font-size:14px}
+.chat-header-text .ch-sub{font-size:12px;color:var(--muted)}
+.chat-messages{flex:1;overflow-y:auto;padding:24px;display:flex;flex-direction:column;gap:16px}
+.msg{display:flex;gap:10px;max-width:82%;animation:fadeUp .3s ease}
+.msg.user{align-self:flex-end;flex-direction:row-reverse}
+.msg-avatar{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;flex-shrink:0}
+.msg-ai-av{background:var(--ink);color:white;font-size:13px}
+.msg-user-av{background:var(--accent);color:white}
+.msg-bubble{padding:12px 16px;border-radius:14px;font-size:14px;line-height:1.6}
+.msg.ai .msg-bubble{background:var(--card);border:1px solid var(--border);border-radius:14px 14px 14px 4px;box-shadow:var(--shadow)}
+.msg.user .msg-bubble{background:var(--ink);color:white;border-radius:14px 14px 4px 14px}
+.msg-bubble p{margin-bottom:8px} .msg-bubble p:last-child{margin-bottom:0}
+.msg-bubble strong{font-weight:600} .msg-bubble ul{padding-left:18px;margin:6px 0} .msg-bubble li{margin-bottom:4px}
+.typing-indicator{display:flex;gap:4px;align-items:center;padding:12px 16px;background:var(--card);border:1px solid var(--border);border-radius:14px 14px 14px 4px;width:fit-content;box-shadow:var(--shadow)}
+.typing-dot{width:7px;height:7px;border-radius:50%;background:var(--muted);animation:typing 1.2s infinite}
+.typing-dot:nth-child(2){animation-delay:.2s} .typing-dot:nth-child(3){animation-delay:.4s}
+@keyframes typing{0%,60%,100%{opacity:.3;transform:translateY(0)}30%{opacity:1;transform:translateY(-4px)}}
+.chat-input-area{padding:16px 24px;border-top:1px solid var(--border);background:var(--card)}
+.quick-prompts{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.qp-btn{padding:5px 12px;border-radius:20px;font-size:12px;cursor:pointer;border:1px solid var(--border);background:var(--cream);color:var(--ink);transition:all .2s;font-family:'DM Sans',sans-serif}
+.qp-btn:hover{background:var(--accent);color:white;border-color:var(--accent)}
+.input-row{display:flex;gap:10px;align-items:flex-end}
+.chat-input{flex:1;padding:10px 16px;border:1px solid var(--border);border-radius:12px;font-size:14px;font-family:'DM Sans',sans-serif;background:var(--paper);color:var(--ink);resize:none;min-height:44px;max-height:120px;outline:none;transition:border-color .2s;line-height:1.5}
+.chat-input:focus{border-color:var(--accent)}
+.send-btn{width:44px;height:44px;border-radius:10px;background:var(--ink);color:white;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0}
+.send-btn:hover{background:var(--accent);transform:scale(1.05)}
+.send-btn:disabled{opacity:.4;cursor:not-allowed;transform:none}
+
+/* ── MESSAGES ── */
+.messages-layout{display:flex;flex:1;height:calc(100vh - 60px);overflow:hidden}
+.msg-list{width:280px;border-right:1px solid var(--border);overflow-y:auto;background:var(--card)}
+.msg-list-header{padding:20px;border-bottom:1px solid var(--border);font-family:'DM Serif Display',serif;font-size:18px}
+.conv-item{display:flex;gap:12px;padding:14px 16px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .15s;align-items:flex-start}
+.conv-item:hover{background:var(--cream)} .conv-item.active{background:var(--cream)}
+.conv-av{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:13px;color:white;flex-shrink:0}
+.conv-name{font-size:13px;font-weight:600;margin-bottom:2px}
+.conv-preview{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:160px}
+.conv-time{font-size:11px;color:var(--muted);margin-left:auto;flex-shrink:0}
+.dm-area{flex:1;display:flex;flex-direction:column}
+.dm-header{padding:16px 24px;border-bottom:1px solid var(--border);background:var(--card);display:flex;align-items:center;gap:12px}
+.dm-messages{flex:1;overflow-y:auto;padding:24px;display:flex;flex-direction:column;gap:14px}
+.dm-msg{display:flex;gap:8px;max-width:78%;animation:fadeUp .3s ease}
+.dm-msg.mine{align-self:flex-end;flex-direction:row-reverse}
+.dm-bubble{padding:10px 14px;border-radius:14px;font-size:13px;line-height:1.5}
+.dm-msg:not(.mine) .dm-bubble{background:var(--card);border:1px solid var(--border);border-radius:14px 14px 14px 4px}
+.dm-msg.mine .dm-bubble{background:var(--ink);color:white;border-radius:14px 14px 4px 14px}
+.dm-time{font-size:10px;color:var(--muted);margin-top:3px;text-align:center;align-self:flex-end}
+.dm-input-area{padding:16px 24px;border-top:1px solid var(--border);background:var(--card);display:flex;gap:10px}
+.dm-input{flex:1;padding:10px 16px;border:1px solid var(--border);border-radius:12px;font-size:14px;font-family:'DM Sans',sans-serif;background:var(--paper);color:var(--ink);outline:none}
+.dm-input:focus{border-color:var(--accent)}
+.empty-dm{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--muted);gap:12px}
+.empty-dm .em-icon{font-size:40px;opacity:.3}
+
+/* ── PROFILE ── */
+.profile-page{padding:40px 48px;max-width:900px}
+.profile-header{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:32px;display:flex;gap:24px;align-items:flex-start;margin-bottom:24px;box-shadow:var(--shadow)}
+.profile-avatar-lg{width:80px;height:80px;border-radius:50%;background:var(--accent);color:white;display:flex;align-items:center;justify-content:center;font-family:'DM Serif Display',serif;font-size:28px;flex-shrink:0}
+.profile-info h2{font-family:'DM Serif Display',serif;font-size:26px;margin-bottom:4px}
+.profile-role{color:var(--muted);font-size:14px;margin-bottom:12px}
+.profile-tags{display:flex;gap:8px;flex-wrap:wrap}
+.profile-tag{font-size:12px;padding:4px 12px;border-radius:20px;border:1px solid var(--border)}
+.pt-goal{background:var(--teal-light);color:var(--teal);border-color:rgba(26,107,90,.2)}
+.pt-skill{background:var(--cream);color:var(--ink)}
+.profile-cards{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.p-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;box-shadow:var(--shadow)}
+.p-card-title{font-family:'DM Serif Display',serif;font-size:16px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center}
+.edit-link{font-size:12px;color:var(--accent);cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:500}
+.edit-link:hover{text-decoration:underline}
+.info-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px}
+.info-row:last-child{border-bottom:none}
+.info-label{color:var(--muted)} .info-val{font-weight:500}
+
+/* ── MODAL ── */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:500;display:flex;align-items:center;justify-content:center;animation:fadeIn .2s ease}
+.modal-box{background:var(--card);border-radius:16px;padding:28px;width:100%;max-width:520px;max-height:90vh;overflow-y:auto;box-shadow:var(--shadow-lg);animation:slideUp .3s ease}
+.modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px}
+.modal-title{font-family:'DM Serif Display',serif;font-size:22px}
+.modal-close{width:32px;height:32px;border-radius:50%;border:none;background:var(--cream);color:var(--muted);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:all .2s}
+.modal-close:hover{background:var(--border);color:var(--ink)}
+.modal-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.modal-group{display:flex;flex-direction:column;gap:5px}
+.modal-group.full{grid-column:1/-1}
+.modal-label{font-size:12px;color:var(--muted);font-weight:500}
+.modal-input{padding:9px 12px;border:1px solid var(--border);border-radius:8px;font-size:14px;font-family:'DM Sans',sans-serif;background:var(--paper);color:var(--ink);outline:none;transition:border-color .2s}
+.modal-input:focus{border-color:var(--accent)}
+.modal-footer{display:flex;gap:10px;justify-content:flex-end;margin-top:20px;padding-top:16px;border-top:1px solid var(--border)}
+.modal-btn-cancel{padding:9px 20px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--muted);font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s}
+.modal-btn-cancel:hover{border-color:var(--ink);color:var(--ink)}
+.modal-btn-save{padding:9px 20px;border-radius:8px;background:var(--ink);color:white;font-size:13px;font-weight:500;cursor:pointer;border:none;font-family:'DM Sans',sans-serif;transition:all .2s}
+.modal-btn-save:hover{background:var(--accent)}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:24px;right:24px;background:var(--ink);color:white;padding:12px 20px;border-radius:10px;font-size:13px;z-index:999;animation:slideUp .3s ease;box-shadow:var(--shadow-lg)}
+
+/* ── FOOTER ── */
+footer{background:var(--ink);color:rgba(255,255,255,.4);text-align:center;padding:20px 32px;font-size:12px;margin-top:auto}
+footer strong{color:rgba(255,255,255,.7)}
+footer a{color:var(--accent);text-decoration:none}
+
+/* ── COMPANY DASHBOARD ── */
+.company-dash{padding:40px 48px;flex:1}
+.cdash-header{background:var(--ink);color:white;border-radius:16px;padding:28px;margin-bottom:24px;display:flex;align-items:center;gap:20px}
+.cdash-logo{width:60px;height:60px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:22px;color:white;flex-shrink:0}
+.cdash-name{font-family:'DM Serif Display',serif;font-size:24px;margin-bottom:2px}
+.cdash-sub{font-size:13px;color:rgba(255,255,255,.5)}
+.cdash-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px}
+.cdash-stat{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;text-align:center;box-shadow:var(--shadow)}
+.cdash-stat-num{font-family:'DM Serif Display',serif;font-size:28px;color:var(--accent);margin-bottom:2px}
+.cdash-stat-lbl{font-size:12px;color:var(--muted)}
+.cdash-jobs-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.btn-post{padding:10px 20px;border-radius:9px;background:var(--accent);color:white;font-size:13px;font-weight:600;cursor:pointer;border:none;font-family:'DM Sans',sans-serif;transition:all .2s}
+.btn-post:hover{background:var(--accent-dark);transform:translateY(-1px)}
+.company-jobs-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px}
+.cjob-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px;box-shadow:var(--shadow)}
+.cjob-title{font-weight:600;font-size:14px;margin-bottom:6px}
+.cjob-meta{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.cjob-actions{display:flex;gap:8px}
+.btn-edit-job{padding:5px 12px;border-radius:7px;font-size:12px;cursor:pointer;border:1px solid var(--border);background:var(--cream);color:var(--ink);font-family:'DM Sans',sans-serif;transition:all .2s}
+.btn-edit-job:hover{border-color:var(--accent);color:var(--accent)}
+.btn-del-job{padding:5px 12px;border-radius:7px;font-size:12px;cursor:pointer;border:1px solid var(--coral-light);background:var(--coral-light);color:var(--coral);font-family:'DM Sans',sans-serif;transition:all .2s}
+.btn-del-job:hover{background:var(--coral);color:white}
+
+/* Apply modal */
+.apply-success{text-align:center;padding:20px 0}
+.apply-success .check{font-size:48px;margin-bottom:12px}
+.apply-success h3{font-family:'DM Serif Display',serif;font-size:22px;margin-bottom:8px}
+.apply-success p{color:var(--muted);font-size:14px}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════ PORTAL ═══════════════════ -->
+<div id="portalScreen">
+  <div class="portal-box">
+    <div class="portal-logo">Alumni<span>Connect</span></div>
+    <div class="portal-tagline" data-i18n="portal_tagline">AI Destekli Kariyer & Mezun Platformu</div>
+
+    <div class="portal-type-row">
+      <button class="ptype-btn active" id="ptype-student" onclick="setPortalType('student')" data-i18n="ptype_student">Öğrenci / Mezun</button>
+      <button class="ptype-btn" id="ptype-company" onclick="setPortalType('company')" data-i18n="ptype_company">Şirket</button>
+    </div>
+
+    <div class="portal-card">
+      <div class="portal-tabs">
+        <button class="ptab active" id="ptab-login" onclick="setPortalTab('login')" data-i18n="ptab_login">Giriş Yap</button>
+        <button class="ptab" id="ptab-register" onclick="setPortalTab('register')" data-i18n="ptab_register">Kayıt Ol</button>
+      </div>
+
+      <!-- LOGIN FORM -->
+      <div id="pform-login">
+        <div class="portal-form">
+          <div class="pform-group">
+            <label class="pform-label" data-i18n="label_email">E-posta</label>
+            <input class="pform-input" type="email" id="login-email" data-i18n-placeholder="ph_email" placeholder="ornek@universite.edu.tr">
+          </div>
+          <div class="pform-group">
+            <label class="pform-label" data-i18n="label_password">Şifre</label>
+            <input class="pform-input" type="password" id="login-pass" data-i18n-placeholder="ph_password" placeholder="••••••••">
+          </div>
+          <div class="portal-err" id="login-err"></div>
+          <button class="portal-submit" onclick="doLogin()" data-i18n="btn_login">Giriş Yap</button>
+        </div>
+      </div>
+
+      <!-- REGISTER FORM -->
+      <div id="pform-register" style="display:none">
+        <div class="portal-form" id="reg-student-fields">
+          <div class="pform-group">
+            <label class="pform-label" data-i18n="label_fullname">Ad Soyad</label>
+            <input class="pform-input" type="text" id="reg-name" data-i18n-placeholder="ph_fullname" placeholder="Ahmet Yılmaz">
+          </div>
+          <div class="pform-group">
+            <label class="pform-label" data-i18n="label_email">E-posta</label>
+            <input class="pform-input" type="email" id="reg-email" data-i18n-placeholder="ph_email" placeholder="ahmet@itu.edu.tr">
+          </div>
+          <div class="pform-group">
+            <label class="pform-label" data-i18n="label_dept">Bölüm</label>
+            <input class="pform-input" type="text" id="reg-dept" data-i18n-placeholder="ph_dept" placeholder="Bilgisayar Mühendisliği">
+          </div>
+          <div class="pform-group">
+            <label class="pform-label" data-i18n="label_type">Tür</label>
+            <select class="pform-select" id="reg-utype">
+              <option value="student" data-i18n="opt_student">Öğrenci</option>
+              <option value="alumni" data-i18n="opt_alumni">Mezun</option>
+            </select>
+          </div>
+          <div class="pform-group">
+            <label class="pform-label" data-i18n="label_password">Şifre</label>
+            <input class="pform-input" type="password" id="reg-pass" data-i18n-placeholder="ph_password" placeholder="••••••••">
+          </div>
+          <div class="portal-err" id="reg-err"></div>
+          <button class="portal-submit" onclick="doRegister()" data-i18n="btn_register">Kayıt Ol</button>
+        </div>
+
+        <div class="portal-form" id="reg-company-fields" style="display:none">
+          <div class="pform-group">
+            <label class="pform-label" data-i18n="label_company_name">Şirket Adı</label>
+            <input class="pform-input" type="text" id="reg-cname" placeholder="Trendyol">
+          </div>
+          <div class="pform-group">
+            <label class="pform-label" data-i18n="label_sector">Sektör</label>
+            <input class="pform-input" type="text" id="reg-csector" data-i18n-placeholder="ph_sector" placeholder="E-ticaret / Teknoloji">
+          </div>
+          <div class="pform-group">
+            <label class="pform-label" data-i18n="label_email">E-posta</label>
+            <input class="pform-input" type="email" id="reg-cemail" placeholder="hr@trendyol.com">
+          </div>
+          <div class="pform-group">
+            <label class="pform-label" data-i18n="label_password">Şifre</label>
+            <input class="pform-input" type="password" id="reg-cpass" data-i18n-placeholder="ph_password" placeholder="••••••••">
+          </div>
+          <div class="portal-err" id="reg-cerr"></div>
+          <button class="portal-submit" onclick="doCompanyRegister()" data-i18n="btn_register">Kayıt Ol</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="portal-demo">
+      <span onclick="demoLogin('student')" data-i18n="demo_student">Demo: Öğrenci girişi</span> &nbsp;·&nbsp;
+      <span onclick="demoLogin('company')" data-i18n="demo_company">Demo: Şirket girişi</span>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════ MAIN APP ═══════════════════ -->
+<div class="app" id="mainApp" style="display:none">
+
+  <nav>
+    <div class="nav-logo" onclick="showPage('home')">Alumni<span>Connect</span></div>
+    <div class="nav-tabs" id="navTabs">
+      <button class="nav-tab active" onclick="showPage('home')" data-i18n="nav_explore">Keşfet</button>
+      <button class="nav-tab" onclick="showPage('jobs')" data-i18n="nav_jobs">İlanlar</button>
+      <button class="nav-tab" onclick="showPage('ai')" data-i18n="nav_ai">AI Kariyer</button>
+      <button class="nav-tab" onclick="showPage('messages')" data-i18n="nav_messages">Mesajlar</button>
+      <button class="nav-tab" onclick="showPage('profile')" data-i18n="nav_profile">Profil</button>
+    </div>
+    <div class="nav-right">
+      <div class="lang-toggle">
+        <button class="lang-btn active" id="btn-tr" onclick="setLang('tr')">TR</button>
+        <button class="lang-btn" id="btn-en" onclick="setLang('en')">EN</button>
+      </div>
+      <div class="user-pill" onclick="showPage('profile')">
+        <div class="avatar" id="navAvatar">AY</div>
+        <span id="navUserName">Ahmet Yılmaz</span>
+        <span class="company-pill-badge" id="navBadge" style="display:none">ŞİRKET</span>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ── HOME ── -->
+  <div id="page-home" class="page active">
+    <div class="home-hero">
+      <div class="hero-inner">
+        <div class="hero-tag" data-i18n="hero_tag">AI Destekli Kariyer Platformu</div>
+        <h1 class="hero-title" data-i18n-html="hero_title">Kariyerine <em>yön ver</em>,<br>mezunlarla bağlan.</h1>
+        <p class="hero-sub" data-i18n="hero_sub">AI destekli eşleştirme ile sana en uygun mentorları buluyoruz. Gerçek kariyer tavsiyeleri, gerçek bağlantılar.</p>
+        <div class="hero-btns">
+          <button class="btn btn-primary" onclick="showPage('ai')" data-i18n="hero_btn1">AI ile Kariyer Planla</button>
+          <button class="btn btn-outline" onclick="showPage('jobs')" data-i18n="hero_btn2">İlanları Gör</button>
+        </div>
+      </div>
+    </div>
+    <div class="home-content">
+      <div class="stats-row">
+        <div class="stat-card"><div class="stat-num">1,240</div><div class="stat-lbl" data-i18n="stat1">Aktif Mezun</div></div>
+        <div class="stat-card"><div class="stat-num">87%</div><div class="stat-lbl" data-i18n="stat2">Eşleştirme Başarısı</div></div>
+        <div class="stat-card"><div class="stat-num">340+</div><div class="stat-lbl" data-i18n="stat3">Şirket Ortağı</div></div>
+      </div>
+      <h2 class="section-title" id="alumni-list" data-i18n="suggested_alumni">Sana Önerilen Mezunlar</h2>
+      <div class="alumni-grid" id="alumniGrid"></div>
+    </div>
+  </div>
+
+  <!-- ── JOBS ── -->
+  <div id="page-jobs" class="page">
+    <!-- student view -->
+    <div class="jobs-layout" id="jobsStudentView">
+      <div class="jobs-sidebar">
+        <div class="jobs-sidebar-header">
+          <input class="jobs-search" id="jobSearchInput" data-i18n-placeholder="ph_job_search" placeholder="İlan ara..." oninput="filterJobs()">
+          <div class="jobs-filter-row" id="jobFilters">
+            <button class="filter-chip active" onclick="setFilter('all',this)" data-i18n="filter_all">Tümü</button>
+            <button class="filter-chip" onclick="setFilter('Tam Zamanlı',this)" data-i18n="filter_fulltime">Tam Zamanlı</button>
+            <button class="filter-chip" onclick="setFilter('Staj',this)" data-i18n="filter_intern">Staj</button>
+            <button class="filter-chip" onclick="setFilter('Uzaktan',this)" data-i18n="filter_remote">Uzaktan</button>
+          </div>
+        </div>
+        <div id="jobListItems"></div>
+      </div>
+      <div id="jobDetail" class="job-detail">
+        <div class="job-detail-empty">
+          <div style="font-size:40px;opacity:.2">💼</div>
+          <div style="font-size:14px" data-i18n="job_select_prompt">Bir ilan seçin</div>
+        </div>
+      </div>
+    </div>
+    <!-- company view -->
+    <div class="company-dash" id="jobsCompanyView" style="display:none">
+      <div class="cdash-header">
+        <div class="cdash-logo" id="cdashLogo">T</div>
+        <div>
+          <div class="cdash-name" id="cdashName">Trendyol</div>
+          <div class="cdash-sub" id="cdashSub">E-ticaret / Teknoloji</div>
+        </div>
+      </div>
+      <div class="cdash-stats">
+        <div class="cdash-stat"><div class="cdash-stat-num" id="cds-active">3</div><div class="cdash-stat-lbl" data-i18n="cds_active">Aktif İlan</div></div>
+        <div class="cdash-stat"><div class="cdash-stat-num">24</div><div class="cdash-stat-lbl" data-i18n="cds_apps">Başvuru</div></div>
+        <div class="cdash-stat"><div class="cdash-stat-num">8</div><div class="cdash-stat-lbl" data-i18n="cds_msgs">Mesaj</div></div>
+        <div class="cdash-stat"><div class="cdash-stat-num">5</div><div class="cdash-stat-lbl" data-i18n="cds_alumni">Çalışan Alumni</div></div>
+      </div>
+      <div class="cdash-jobs-header">
+        <h2 class="section-title" style="margin:0" data-i18n="my_postings">İlanlarım</h2>
+        <button class="btn-post" onclick="openPostJobModal()" data-i18n="btn_post_job">+ Yeni İlan</button>
+      </div>
+      <div class="company-jobs-grid" id="companyJobsGrid"></div>
+    </div>
+  </div>
+
+  <!-- ── AI ── -->
+  <div id="page-ai" class="page">
+    <div class="chat-layout">
+      <div class="chat-sidebar">
+        <div class="sidebar-header">
+          <div class="sidebar-title" data-i18n="ai_sidebar_title">AI Kariyer Asistanı</div>
+          <div class="sidebar-sub" data-i18n="ai_sidebar_sub">Claude ile güçlendirilmiş</div>
+        </div>
+        <div class="sidebar-options">
+          <div class="option-item active" onclick="setMode('mentor',this)"><div class="option-title" data-i18n="mode_mentor_title">Mentor Eşleştirme</div><div class="option-sub" data-i18n="mode_mentor_sub">En uygun mezunu bul</div></div>
+          <div class="option-item" onclick="setMode('roadmap',this)"><div class="option-title" data-i18n="mode_roadmap_title">Kariyer Yol Haritası</div><div class="option-sub" data-i18n="mode_roadmap_sub">Hedefine adım adım</div></div>
+          <div class="option-item" onclick="setMode('cv',this)"><div class="option-title" data-i18n="mode_cv_title">CV Analizi</div><div class="option-sub" data-i18n="mode_cv_sub">CV'ni güçlendir</div></div>
+          <div class="option-item" onclick="setMode('salary',this)"><div class="option-title" data-i18n="mode_salary_title">Maaş Rehberi</div><div class="option-sub" data-i18n="mode_salary_sub">Sektör maaşlarını öğren</div></div>
+          <div class="option-item" onclick="setMode('interview',this)"><div class="option-title" data-i18n="mode_interview_title">Mülakat Hazırlığı</div><div class="option-sub" data-i18n="mode_interview_sub">Sorular ve teknikler</div></div>
+          <div class="option-item" onclick="setMode('sector',this)"><div class="option-title" data-i18n="mode_sector_title">Sektör Analizi</div><div class="option-sub" data-i18n="mode_sector_sub">Trend ve fırsatlar</div></div>
+        </div>
+      </div>
+      <div class="chat-main">
+        <div class="chat-header">
+          <div class="chat-icon">✦</div>
+          <div class="chat-header-text">
+            <div class="ch-title" id="chatTitle">Mentor Eşleştirme</div>
+            <div class="ch-sub" data-i18n="chat_header_sub">Sana en uygun mezunları buluyorum</div>
+          </div>
+        </div>
+        <div class="chat-messages" id="chatMessages">
+          <div class="msg ai">
+            <div class="msg-avatar msg-ai-av">✦</div>
+            <div class="msg-bubble">
+              <p data-i18n="greeting">Merhaba! 👋 Ben AlumniConnect'in AI kariyer asistanıyım.</p>
+              <p data-i18n="greeting2">Sana en uygun mezunları bulmak, kariyer yol haritası oluşturmak veya CV'ni analiz etmek için buradayım.</p>
+              <p data-i18n="greeting3">Nasıl yardımcı olabilirim?</p>
+            </div>
+          </div>
+        </div>
+        <div class="chat-input-area">
+          <div class="quick-prompts">
+            <button class="qp-btn" onclick="sendQuick(t('qp1_msg'))" data-i18n="qp1">Yazılım kariyeri planla</button>
+            <button class="qp-btn" onclick="sendQuick(t('qp2_msg'))" data-i18n="qp2">Mentor öner</button>
+            <button class="qp-btn" onclick="sendQuick(t('qp3_msg'))" data-i18n="qp3">CV güçlendir</button>
+            <button class="qp-btn" onclick="sendQuick(t('qp4_msg'))" data-i18n="qp4">Sektör trendleri</button>
+          </div>
+          <div class="input-row">
+            <textarea class="chat-input" id="chatInput" data-i18n-placeholder="chat_placeholder" placeholder="Sorunuzu yazın..." rows="1" onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
+            <button class="send-btn" id="sendBtn" onclick="sendMessage()">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── MESSAGES ── -->
+  <div id="page-messages" class="page">
+    <div class="messages-layout">
+      <div class="msg-list">
+        <div class="msg-list-header" data-i18n="messages_title">Mesajlar</div>
+        <div id="convList"></div>
+      </div>
+      <div class="dm-area" id="dmArea">
+        <div class="empty-dm">
+          <div class="em-icon">💬</div>
+          <div class="em-text" data-i18n="select_conv">Bir konuşma seçin</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── PROFILE ── -->
+  <div id="page-profile" class="page">
+    <div class="profile-page" id="profileContent"></div>
+  </div>
+
+  <footer>
+    <strong>AlumniConnect</strong> bir <a href="#">chabatu</a> projesidir. &nbsp;·&nbsp; RNU için hazırlanmıştır. &nbsp;·&nbsp; ©2026–2026
+  </footer>
+</div>
+
+<!-- ── EDIT PROFILE MODAL ── -->
+<div class="modal-overlay" id="editProfileModal" style="display:none">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div class="modal-title" data-i18n="modal_edit_title">Profili Düzenle</div>
+      <button class="modal-close" onclick="closeModal('editProfileModal')">✕</button>
+    </div>
+    <div class="modal-grid" id="editProfileFields"></div>
+    <div class="modal-footer">
+      <button class="modal-btn-cancel" onclick="closeModal('editProfileModal')" data-i18n="btn_cancel">İptal</button>
+      <button class="modal-btn-save" onclick="saveProfile()" data-i18n="btn_save">Kaydet</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── POST JOB MODAL ── -->
+<div class="modal-overlay" id="postJobModal" style="display:none">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div class="modal-title" data-i18n="modal_post_job">Yeni İlan Oluştur</div>
+      <button class="modal-close" onclick="closeModal('postJobModal')">✕</button>
+    </div>
+    <div class="modal-grid">
+      <div class="modal-group full"><label class="modal-label" data-i18n="label_job_title">Pozisyon Başlığı</label><input class="modal-input" id="pj-title" data-i18n-placeholder="ph_job_title" placeholder="Senior Frontend Developer"></div>
+      <div class="modal-group"><label class="modal-label" data-i18n="label_job_type">İlan Türü</label><select class="modal-input" id="pj-type"><option data-i18n="opt_fulltime">Tam Zamanlı</option><option data-i18n="opt_intern">Staj</option><option data-i18n="opt_remote">Uzaktan</option></select></div>
+      <div class="modal-group"><label class="modal-label" data-i18n="label_dept">Departman</label><input class="modal-input" id="pj-dept" data-i18n-placeholder="ph_dept_eng" placeholder="Mühendislik"></div>
+      <div class="modal-group"><label class="modal-label" data-i18n="label_salary">Maaş Aralığı</label><input class="modal-input" id="pj-salary" placeholder="40.000 - 60.000 TL"></div>
+      <div class="modal-group"><label class="modal-label" data-i18n="label_location">Lokasyon</label><input class="modal-input" id="pj-location" placeholder="İstanbul / Uzaktan"></div>
+      <div class="modal-group full"><label class="modal-label" data-i18n="label_description">Açıklama</label><textarea class="modal-input" id="pj-desc" rows="3" data-i18n-placeholder="ph_job_desc" placeholder="Pozisyon hakkında kısa açıklama..."></textarea></div>
+      <div class="modal-group full"><label class="modal-label" data-i18n="label_requirements">Gereksinimler</label><input class="modal-input" id="pj-reqs" data-i18n-placeholder="ph_reqs" placeholder="React, TypeScript, 3+ yıl deneyim"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="modal-btn-cancel" onclick="closeModal('postJobModal')" data-i18n="btn_cancel">İptal</button>
+      <button class="modal-btn-save" onclick="postJob()" data-i18n="btn_post_job">İlanı Yayınla</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── APPLY MODAL ── -->
+<div class="modal-overlay" id="applyModal" style="display:none">
+  <div class="modal-box" style="max-width:420px">
+    <div id="applyFormView">
+      <div class="modal-header">
+        <div class="modal-title" data-i18n="modal_apply">Başvur</div>
+        <button class="modal-close" onclick="closeModal('applyModal')">✕</button>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div class="modal-group"><label class="modal-label" data-i18n="label_cover">Ön Yazı</label><textarea class="modal-input" id="apply-cover" rows="4" data-i18n-placeholder="ph_cover" placeholder="Neden bu pozisyon için uygun olduğunuzu kısaca anlatın..."></textarea></div>
+        <div class="modal-group"><label class="modal-label" data-i18n="label_cv_link">CV Linki (LinkedIn / Drive)</label><input class="modal-input" id="apply-cv" placeholder="https://linkedin.com/in/..."></div>
+      </div>
+      <div class="modal-footer">
+        <button class="modal-btn-cancel" onclick="closeModal('applyModal')" data-i18n="btn_cancel">İptal</button>
+        <button class="modal-btn-save" onclick="submitApply()" data-i18n="btn_apply">Başvuruyu Gönder</button>
+      </div>
+    </div>
+    <div id="applySuccessView" style="display:none" class="apply-success">
+      <div class="check">✅</div>
+      <h3 data-i18n="apply_success_title">Başvurunuz Alındı!</h3>
+      <p data-i18n="apply_success_sub">Şirket en kısa sürede sizinle iletişime geçecek.</p>
+      <button class="modal-btn-save" style="margin-top:16px" onclick="closeModal('applyModal');resetApplyModal()" data-i18n="btn_close">Kapat</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════
+//  DATA
+// ══════════════════════════════════════════════
+let currentUser = null; // { type:'student'|'company', name, initials, ... }
+let currentLang = 'tr';
+let currentMode = 'mentor';
+let chatHistory = [];
+let isLoading = false;
+let activeConv = null;
+let activeJobId = null;
+let jobFilter = 'all';
+
+// Demo accounts
+const demoAccounts = {
+  student: { type:'student', name:'Ahmet Yılmaz', initials:'AY', email:'ahmet@itu.edu.tr', dept:'Bilgisayar Mühendisliği', uni:'İstanbul Teknik Üniversitesi', year:'3. Sınıf', goal:'Product Manager', sector:'Fintech / SaaS', skills:'Python, React, SQL', city:'İstanbul', linkedin:'linkedin.com/in/ahmet', color:var_accent() },
+  company: { type:'company', name:'Trendyol', initials:'T', email:'hr@trendyol.com', sector:'E-ticaret / Teknoloji', city:'İstanbul', color:'#c44d3a', website:'trendyol.com' }
+};
+
+function var_accent(){ return '#c8a96e'; }
+
+const alumni = [
+  { name:"Selin Kaya", initials:"SK", color:"#1a6b5a", role:"Senior Product Manager", company:"Getir", dept:"Bil. Müh. 2018", tags:["Product","Agile","Fintech"], match:94 },
+  { name:"Mert Özdemir", initials:"MÖ", color:"#c44d3a", role:"Software Engineer", company:"Trendyol", dept:"Bil. Müh. 2019", tags:["React","Node.js","AWS"], match:88 },
+  { name:"Ayşe Türk", initials:"AT", color:"#534AB7", role:"Data Scientist", company:"Yapı Kredi", dept:"End. Müh. 2017", tags:["ML","Python","Fintech"], match:81 },
+  { name:"Burak Şahin", initials:"BŞ", color:"#854F0B", role:"UX Lead", company:"Peak Games", dept:"Tasarım 2020", tags:["UX","Figma","Gaming"], match:75 },
+  { name:"Zeynep Arslan", initials:"ZA", color:"#185FA5", role:"Startup Founder", company:"NovaTech", dept:"Yönetim 2016", tags:["Startup","Fundraising","B2B"], match:79 },
+  { name:"Emre Çelik", initials:"EÇ", color:"#3B6D11", role:"DevOps Engineer", company:"PayTR", dept:"Bil. Müh. 2021", tags:["Docker","K8s","CI/CD"], match:70 },
+];
+
+const jobs = [
+  { id:1, title:"Senior Frontend Developer", company:"Trendyol", companyColor:"#c44d3a", companyInitials:"T", type:"Tam Zamanlı", location:"İstanbul", salary:"50.000 - 80.000 TL", dept:"Mühendislik", isNew:true, poster:{ name:"Mert Özdemir", initials:"MÖ", color:"#c44d3a", role:"Software Engineer" }, desc:"Trendyol'un büyüyen frontend ekibine katılacak deneyimli bir geliştirici arıyoruz. React ve TypeScript konusunda derinlemesine bilgi gereklidir.", reqs:["React 18+","TypeScript","3+ yıl deneyim","Test yazma (Jest/RTL)"] },
+  { id:2, title:"Product Manager – Payments", company:"Getir", companyColor:"#1a6b5a", companyInitials:"G", type:"Tam Zamanlı", location:"İstanbul / Uzaktan", salary:"60.000 - 90.000 TL", dept:"Ürün", isNew:true, poster:{ name:"Selin Kaya", initials:"SK", color:"#1a6b5a", role:"Senior PM" }, desc:"Ödeme ürünleri ekibimize liderlik edecek, stratejik bakış açısına sahip bir PM arıyoruz.", reqs:["PM deneyimi 3+ yıl","Fintech bilgisi","Veri odaklı karar alma","Agile/Scrum"] },
+  { id:3, title:"Yazılım Geliştirici Stajyeri", company:"NovaTech", companyColor:"#185FA5", companyInitials:"N", type:"Staj", location:"İstanbul", salary:"15.000 - 20.000 TL", dept:"Mühendislik", isNew:false, poster:{ name:"Zeynep Arslan", initials:"ZA", color:"#185FA5", role:"Founder" }, desc:"Startup ortamında hızlı büyümek isteyen junior geliştiriciler için mükemmel bir fırsat.", reqs:["Python veya JS","Üniversite 3-4. sınıf","Girişimci ruh","GitHub profili"] },
+  { id:4, title:"Data Analyst", company:"Yapı Kredi", companyColor:"#534AB7", companyInitials:"YK", type:"Tam Zamanlı", location:"İstanbul", salary:"35.000 - 55.000 TL", dept:"Analitik", isNew:false, poster:{ name:"Ayşe Türk", initials:"AT", color:"#534AB7", role:"Data Scientist" }, desc:"Fintech veri ekibimizde, ürün ve iş kararlarını destekleyecek analizler üretecek bir veri analisti arıyoruz.", reqs:["SQL (ileri seviye)","Python / R","Dashboard araçları","İstatistik bilgisi"] },
+  { id:5, title:"UX Designer – Mobile", company:"Peak Games", companyColor:"#854F0B", companyInitials:"PG", type:"Uzaktan", location:"Uzaktan", salary:"40.000 - 60.000 TL", dept:"Tasarım", isNew:false, poster:{ name:"Burak Şahin", initials:"BŞ", color:"#854F0B", role:"UX Lead" }, desc:"Mobil oyun deneyimlerini tasarlayacak, kullanıcı araştırması ve prototipleme konusunda güçlü bir UX tasarımcı.", reqs:["Figma uzmanı","Kullanıcı araştırması","Oyun sektörü tercihen","Portfolyo zorunlu"] },
+];
+
+const conversations = [
+  { id:1, name:"Selin Kaya", initials:"SK", color:"#1a6b5a", preview:"Evet, yarın görüşebiliriz!", time:"10:24", messages:[
+    { mine:false, text:"Merhaba! Profilini inceledim, PM yolculuğun için yardımcı olmaktan mutluluk duyarım.", time:"10:15" },
+    { mine:true,  text:"Merhaba Selin Hanım! Teşekkürler, Getir'deki deneyimlerinizi duymak istiyorum.", time:"10:18" },
+    { mine:false, text:"Tabii! Özellikle ürün roadmap yönetimi konusunda çok şey anlatabilirim.", time:"10:20" },
+    { mine:true,  text:"Harika! Bu hafta uygun bir zaman var mı?", time:"10:22" },
+    { mine:false, text:"Evet, yarın görüşebiliriz!", time:"10:24" },
+  ]},
+  { id:2, name:"Trendyol İK", initials:"T", color:"#c44d3a", preview:"Başvurunuzu aldık, teşekkürler.", time:"Dün", messages:[
+    { mine:true,  text:"Merhaba, Senior Frontend Developer pozisyonuna başvurdum.", time:"Dün 14:00" },
+    { mine:false, text:"Başvurunuzu aldık, teşekkürler. Teknik mülakat için sizi arayacağız.", time:"Dün 15:30" },
+  ]},
+];
+
+// ══════════════════════════════════════════════
+//  PORTAL
+// ══════════════════════════════════════════════
+let portalType = 'student';
+let portalTab = 'login';
+
+function setPortalType(type) {
+  portalType = type;
+  document.getElementById('ptype-student').classList.toggle('active', type==='student');
+  document.getElementById('ptype-company').classList.toggle('active', type==='company');
+  document.getElementById('reg-student-fields').style.display = type==='student' ? 'flex' : 'none';
+  document.getElementById('reg-company-fields').style.display = type==='company' ? 'flex' : 'none';
+}
+
+function setPortalTab(tab) {
+  portalTab = tab;
+  document.getElementById('ptab-login').classList.toggle('active', tab==='login');
+  document.getElementById('ptab-register').classList.toggle('active', tab==='register');
+  document.getElementById('pform-login').style.display = tab==='login' ? 'block' : 'none';
+  document.getElementById('pform-register').style.display = tab==='register' ? 'block' : 'none';
+}
+
+function doLogin() {
+  const email = document.getElementById('login-email').value.trim();
+  const pass  = document.getElementById('login-pass').value;
+  const err   = document.getElementById('login-err');
+  if (!email || !pass) { err.textContent = t('err_fill'); return; }
+  // Check if company email pattern
+  const type = (email.includes('hr@') || email.includes('company') || portalType==='company') ? 'company' : 'student';
+  loginAs(type, email);
+}
+
+function doRegister() {
+  const name = document.getElementById('reg-name').value.trim();
+  const email = document.getElementById('reg-email').value.trim();
+  const err = document.getElementById('reg-err');
+  if (!name || !email) { err.textContent = t('err_fill'); return; }
+  const user = { type:'student', name, initials: name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase(), email, dept: document.getElementById('reg-dept').value||'', uni:'Üniversite', year:'1. Sınıf', goal:'', sector:'', skills:'', city:'', linkedin:'', color:var_accent() };
+  currentUser = user;
+  launchApp();
+}
+
+function doCompanyRegister() {
+  const name = document.getElementById('reg-cname').value.trim();
+  const email = document.getElementById('reg-cemail').value.trim();
+  const err = document.getElementById('reg-cerr');
+  if (!name || !email) { err.textContent = t('err_fill'); return; }
+  const user = { type:'company', name, initials: name.slice(0,1).toUpperCase(), email, sector: document.getElementById('reg-csector').value||'', city:'', color:'#534AB7', website:'' };
+  currentUser = user;
+  launchApp();
+}
+
+function loginAs(type, email) {
+  currentUser = demoAccounts[type];
+  launchApp();
+}
+
+function demoLogin(type) { loginAs(type); }
+
+function launchApp() {
+  document.getElementById('portalScreen').style.display = 'none';
+  document.getElementById('mainApp').style.display = 'flex';
+  updateNavUser();
+  renderAlumni();
+  renderConversations();
+  renderProfile();
+  if (currentUser.type === 'company') {
+    setupCompanyView();
+  }
+}
+
+function updateNavUser() {
+  const u = currentUser;
+  document.getElementById('navAvatar').textContent = u.initials;
+  document.getElementById('navUserName').textContent = u.name;
+  const badge = document.getElementById('navBadge');
+  if (u.type === 'company') {
+    badge.style.display = 'inline';
+    badge.textContent = t('company_badge');
+    // Show/hide company-only tabs
+    document.getElementById('navTabs').querySelector('[onclick="showPage(\'ai\')"]').style.display = 'none';
+    document.getElementById('navTabs').querySelector('[onclick="showPage(\'messages\')"]');
+  } else {
+    badge.style.display = 'none';
+  }
+}
+
+// ══════════════════════════════════════════════
+//  PAGES
+// ══════════════════════════════════════════════
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t2=>t2.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  const tabs = ['home','jobs','ai','messages','profile'];
+  const idx = tabs.indexOf(name);
+  if (idx >= 0) document.querySelectorAll('.nav-tab')[idx]?.classList.add('active');
+  if (name === 'jobs') renderJobsView();
+}
+
+// ══════════════════════════════════════════════
+//  JOBS – STUDENT VIEW
+// ══════════════════════════════════════════════
+function renderJobsView() {
+  if (currentUser?.type === 'company') {
+    document.getElementById('jobsStudentView').style.display = 'none';
+    document.getElementById('jobsCompanyView').style.display = 'block';
+    renderCompanyJobs();
+  } else {
+    document.getElementById('jobsStudentView').style.display = 'flex';
+    document.getElementById('jobsCompanyView').style.display = 'none';
+    renderJobList();
+  }
+}
+
+function filterJobs() { renderJobList(); }
+
+function setFilter(f, el) {
+  jobFilter = f;
+  document.querySelectorAll('.filter-chip').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active');
+  renderJobList();
+}
+
+function renderJobList() {
+  const search = (document.getElementById('jobSearchInput')?.value||'').toLowerCase();
+  let list = jobs.filter(j => {
+    const matchSearch = !search || j.title.toLowerCase().includes(search) || j.company.toLowerCase().includes(search);
+    const matchFilter = jobFilter==='all' || j.type===jobFilter;
+    return matchSearch && matchFilter;
+  });
+  const container = document.getElementById('jobListItems');
+  container.innerHTML = list.map(j=>`
+    <div class="job-list-item ${activeJobId===j.id?'active':''}" onclick="showJobDetail(${j.id})">
+      <div class="jli-company">
+        <div class="company-logo" style="background:${j.companyColor}">${j.companyInitials}</div>
+        <span class="jli-company-name">${j.company}</span>
+      </div>
+      <div class="jli-title">${j.title}</div>
+      <div class="jli-meta">
+        <span class="jli-tag jt-type">${j.type}</span>
+        <span class="jli-tag jt-loc">${j.location}</span>
+        ${j.isNew?`<span class="jli-tag jt-new">${t('badge_new')}</span>`:''}
+      </div>
+    </div>
+  `).join('');
+}
+
+function showJobDetail(id) {
+  activeJobId = id;
+  renderJobList();
+  const j = jobs.find(x=>x.id===id);
+  if (!j) return;
+  const detail = document.getElementById('jobDetail');
+  detail.innerHTML = `
+    <div class="job-detail-header">
+      <div class="jdh-top">
+        <div class="company-logo-lg" style="background:${j.companyColor}">${j.companyInitials}</div>
+        <div>
+          <div class="jdh-title">${j.title}</div>
+          <div class="jdh-company">${j.company}</div>
+        </div>
+      </div>
+      <div class="jdh-tags">
+        <span class="jdh-tag jt-salary">${j.salary}</span>
+        <span class="jdh-tag jt-type">${j.type}</span>
+        <span class="jdh-tag jt-loc">${j.location}</span>
+        <span class="jdh-tag jt-dept">${j.dept}</span>
+      </div>
+      <div class="jdh-actions">
+        <button class="btn-apply" onclick="openApplyModal(${j.id})">${t('btn_apply_now')}</button>
+        <button class="btn-contact" onclick="contactCompany('${j.company}','${j.companyInitials}','${j.companyColor}')">${t('btn_contact_company')}</button>
+      </div>
+    </div>
+    <div class="job-section">
+      <h3>${t('job_desc_title')}</h3>
+      <p>${j.desc}</p>
+    </div>
+    <div class="job-section">
+      <h3>${t('job_reqs_title')}</h3>
+      <ul>${j.reqs.map(r=>`<li>${r}</li>`).join('')}</ul>
+    </div>
+    <div class="job-section">
+      <h3>${t('job_poster_title')}</h3>
+      <div class="poster-card">
+        <div class="conv-av" style="background:${j.poster.color};width:42px;height:42px">${j.poster.initials}</div>
+        <div class="poster-info">
+          <div class="pname">${j.poster.name}</div>
+          <div class="prole">${j.poster.role}</div>
+          <div class="palumni">${t('poster_alumni_label')} · ${j.company}</div>
+        </div>
+        <button class="btn-sm" style="margin-left:auto" onclick="openDM('${j.poster.name}','${j.poster.initials}','${j.poster.color}')">${t('send_msg')}</button>
+      </div>
+    </div>
+  `;
+}
+
+function openApplyModal(jobId) {
+  document.getElementById('applyFormView').style.display = 'block';
+  document.getElementById('applySuccessView').style.display = 'none';
+  document.getElementById('apply-cover').value = '';
+  document.getElementById('apply-cv').value = '';
+  document.getElementById('applyModal').style.display = 'flex';
+}
+
+function submitApply() {
+  document.getElementById('applyFormView').style.display = 'none';
+  document.getElementById('applySuccessView').style.display = 'block';
+  // Auto add company to conversations
+  const j = jobs.find(x=>x.id===activeJobId);
+  if (j && !conversations.find(c=>c.name===j.company+' İK')) {
+    conversations.push({ id:conversations.length+1, name:j.company+' İK', initials:j.companyInitials, color:j.companyColor, preview:t('apply_auto_msg'), time:t('now'), messages:[
+      { mine:false, text:t('apply_auto_msg'), time:t('now') }
+    ]});
+    renderConversations();
+  }
+}
+
+function resetApplyModal() {
+  document.getElementById('applyFormView').style.display = 'block';
+  document.getElementById('applySuccessView').style.display = 'none';
+}
+
+function contactCompany(name, initials, color) {
+  openDM(name+' İK', initials, color);
+  showPage('messages');
+}
+
+// ══════════════════════════════════════════════
+//  JOBS – COMPANY VIEW
+// ══════════════════════════════════════════════
+let companyJobs = jobs.filter(j=>j.company==='Trendyol');
+
+function setupCompanyView() {
+  const u = currentUser;
+  document.getElementById('cdashLogo').textContent = u.initials;
+  document.getElementById('cdashLogo').style.background = u.color;
+  document.getElementById('cdashName').textContent = u.name;
+  document.getElementById('cdashSub').textContent = u.sector||'';
+  companyJobs = jobs.filter(j=>j.company===u.name);
+  if (!companyJobs.length) {
+    // Add a sample job for the company
+    companyJobs = [{id:99,title:"Software Engineer",company:u.name,companyColor:u.color,companyInitials:u.initials,type:"Tam Zamanlı",location:"İstanbul",salary:"40.000 TL",dept:"Mühendislik",isNew:true,poster:{name:u.name,initials:u.initials,color:u.color,role:"HR"},desc:"Sample job.",reqs:[]}];
+  }
+}
+
+function renderCompanyJobs() {
+  document.getElementById('cds-active').textContent = companyJobs.length;
+  const g = document.getElementById('companyJobsGrid');
+  g.innerHTML = companyJobs.map(j=>`
+    <div class="cjob-card">
+      <div class="cjob-title">${j.title}</div>
+      <div class="cjob-meta">
+        <span class="jli-tag jt-type">${j.type}</span>
+        <span class="jli-tag jt-loc">${j.location}</span>
+        ${j.isNew?`<span class="jli-tag jt-new">${t('badge_new')}</span>`:''}
+      </div>
+      <div class="cjob-actions">
+        <button class="btn-edit-job" onclick="editJobModal(${j.id})">${t('btn_edit')}</button>
+        <button class="btn-del-job" onclick="deleteJob(${j.id})">${t('btn_delete')}</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function openPostJobModal() {
+  document.getElementById('postJobModal').style.display = 'flex';
+}
+
+function postJob() {
+  const title = document.getElementById('pj-title').value.trim();
+  if (!title) { showToast(t('err_fill')); return; }
+  const u = currentUser;
+  const newJob = {
+    id: Date.now(), title,
+    company: u.name, companyColor:u.color, companyInitials:u.initials,
+    type: document.getElementById('pj-type').value,
+    location: document.getElementById('pj-location').value||'İstanbul',
+    salary: document.getElementById('pj-salary').value||'—',
+    dept: document.getElementById('pj-dept').value||'',
+    isNew:true,
+    poster:{name:u.name,initials:u.initials,color:u.color,role:'HR'},
+    desc: document.getElementById('pj-desc').value||'',
+    reqs: (document.getElementById('pj-reqs').value||'').split(',').map(s=>s.trim()).filter(Boolean)
+  };
+  jobs.push(newJob);
+  companyJobs.push(newJob);
+  closeModal('postJobModal');
+  renderCompanyJobs();
+  showToast(t('toast_job_posted'));
+}
+
+function deleteJob(id) {
+  const idx = companyJobs.findIndex(j=>j.id===id);
+  if (idx>-1) companyJobs.splice(idx,1);
+  renderCompanyJobs();
+  showToast(t('toast_job_deleted'));
+}
+
+function editJobModal(id) {
+  showToast(t('toast_edit_coming'));
+}
+
+// ══════════════════════════════════════════════
+//  ALUMNI GRID
+// ══════════════════════════════════════════════
+function renderAlumni() {
+  const grid = document.getElementById('alumniGrid');
+  grid.innerHTML = alumni.map(a=>`
+    <div class="alumni-card" onclick="openDM('${a.name}','${a.initials}','${a.color}')">
+      <div class="alumni-card-top">
+        <div class="alumni-avatar" style="background:${a.color}">${a.initials}</div>
+        <div><div class="alumni-name">${a.name}</div><div class="alumni-role">${a.dept}</div></div>
+      </div>
+      <div class="alumni-company">${a.role} · ${a.company}</div>
+      <div class="alumni-tags">${a.tags.map(tg=>`<span class="tag">${tg}</span>`).join('')}</div>
+      <div class="card-footer">
+        <span class="match-badge ${a.match>=85?'match-high':'match-med'}">%${a.match} ${t('match_label')}</span>
+        <button class="btn-sm">${t('send_msg')}</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ══════════════════════════════════════════════
+//  MESSAGES
+// ══════════════════════════════════════════════
+function renderConversations() {
+  const list = document.getElementById('convList');
+  list.innerHTML = conversations.map(c=>`
+    <div class="conv-item ${activeConv===c.id?'active':''}" onclick="openConv(${c.id})">
+      <div class="conv-av" style="background:${c.color}">${c.initials}</div>
+      <div style="flex:1;min-width:0">
+        <div class="conv-name">${c.name}</div>
+        <div class="conv-preview">${c.preview}</div>
+      </div>
+      <div class="conv-time">${c.time}</div>
+    </div>
+  `).join('');
+}
+
+function openConv(id) {
+  activeConv = id;
+  const conv = conversations.find(c=>c.id===id);
+  renderConversations();
+  const dmArea = document.getElementById('dmArea');
+  dmArea.innerHTML = `
+    <div class="dm-header">
+      <div class="conv-av" style="background:${conv.color};width:36px;height:36px">${conv.initials}</div>
+      <div><div style="font-weight:600;font-size:14px">${conv.name}</div><div style="font-size:12px;color:var(--muted)">${t('online')}</div></div>
+    </div>
+    <div class="dm-messages" id="dmMsgs">
+      ${conv.messages.map(m=>`
+        <div class="dm-msg ${m.mine?'mine':''}">
+          ${!m.mine?`<div class="conv-av" style="background:${conv.color};width:28px;height:28px;font-size:10px">${conv.initials}</div>`:''}
+          <div><div class="dm-bubble">${m.text}</div><div class="dm-time">${m.time}</div></div>
+        </div>
+      `).join('')}
+    </div>
+    <div class="dm-input-area">
+      <input class="dm-input" id="dmInput" placeholder="${t('dm_placeholder')}" onkeydown="sendDM(event,${conv.id})">
+      <button class="send-btn" onclick="sendDMBtn(${conv.id})">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+      </button>
+    </div>
+  `;
+}
+
+function sendDM(e,convId){ if(e.key==='Enter') sendDMBtn(convId); }
+
+function sendDMBtn(convId) {
+  const input = document.getElementById('dmInput');
+  const text = input.value.trim();
+  if (!text) return;
+  const conv = conversations.find(c=>c.id===convId);
+  const now = new Date();
+  const timeStr = `${now.getHours()}:${String(now.getMinutes()).padStart(2,'0')}`;
+  conv.messages.push({mine:true,text,time:timeStr});
+  conv.preview = text;
+  input.value = '';
+  const msgs = document.getElementById('dmMsgs');
+  const div = document.createElement('div');
+  div.className = 'dm-msg mine';
+  div.innerHTML = `<div><div class="dm-bubble">${text}</div><div class="dm-time">${timeStr}</div></div>`;
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+  renderConversations();
+}
+
+function openDM(name, initials, color) {
+  let conv = conversations.find(c=>c.name===name);
+  if (!conv) {
+    const id = conversations.length+1;
+    conv = {id,name,initials,color,preview:'',time:t('now'),messages:[
+      {mine:false,text:t('dm_intro'),time:t('now')}
+    ]};
+    conversations.push(conv);
+  }
+  showPage('messages');
+  renderConversations();
+  setTimeout(()=>openConv(conv.id),50);
+}
+
+// ══════════════════════════════════════════════
+//  PROFILE
+// ══════════════════════════════════════════════
+function renderProfile() {
+  const u = currentUser;
+  if (!u) return;
+  const container = document.getElementById('profileContent');
+
+  if (u.type === 'company') {
+    container.innerHTML = `
+      <div class="profile-header">
+        <div class="profile-avatar-lg" style="background:${u.color}">${u.initials}</div>
+        <div class="profile-info">
+          <h2>${u.name}</h2>
+          <div class="profile-role">${u.sector||'—'} · ${u.city||'—'}</div>
+          <div class="profile-tags">
+            <span class="profile-tag pt-goal">${t('label_company_account')}</span>
+          </div>
+        </div>
+        <button class="btn btn-sm" style="margin-left:auto;align-self:flex-start" onclick="openEditProfile()">${t('edit_profile')}</button>
+      </div>
+      <div class="profile-cards">
+        <div class="p-card">
+          <div class="p-card-title">${t('company_info')} <span class="edit-link" onclick="openEditProfile()">${t('edit')}</span></div>
+          <div class="info-row"><span class="info-label">${t('label_company_name')}</span><span class="info-val" id="pf-cname">${u.name}</span></div>
+          <div class="info-row"><span class="info-label">${t('label_sector')}</span><span class="info-val" id="pf-csector">${u.sector||'—'}</span></div>
+          <div class="info-row"><span class="info-label">${t('label_email')}</span><span class="info-val" id="pf-cemail">${u.email||'—'}</span></div>
+          <div class="info-row"><span class="info-label">${t('label_location')}</span><span class="info-val" id="pf-ccity">${u.city||'—'}</span></div>
+          <div class="info-row"><span class="info-label">${t('label_website')}</span><span class="info-val" id="pf-cwebsite" style="color:var(--teal)">${u.website||'—'}</span></div>
+        </div>
+        <div class="p-card">
+          <div class="p-card-title">${t('activity')}</div>
+          <div class="info-row"><span class="info-label">${t('cds_active')}</span><span class="info-val">${companyJobs.length||0}</span></div>
+          <div class="info-row"><span class="info-label">${t('cds_apps')}</span><span class="info-val">24</span></div>
+          <div class="info-row"><span class="info-label">${t('cds_msgs')}</span><span class="info-val">8</span></div>
+          <div class="info-row"><span class="info-label">${t('cds_alumni')}</span><span class="info-val">5</span></div>
+        </div>
+      </div>
+    `;
+  } else {
+    container.innerHTML = `
+      <div class="profile-header">
+        <div class="profile-avatar-lg" style="background:${u.color||'var(--accent)'}">${u.initials}</div>
+        <div class="profile-info">
+          <h2 id="pf-name">${u.name}</h2>
+          <div class="profile-role" id="pf-role">${u.dept||'—'}, ${u.year||'—'} · ${u.uni||'—'}</div>
+          <div class="profile-tags">
+            <span class="profile-tag pt-goal" id="pf-goal-tag">${t('label_goal')}: ${u.goal||'—'}</span>
+            ${(u.skills||'').split(',').map(s=>`<span class="profile-tag pt-skill">${s.trim()}</span>`).join('')}
+          </div>
+        </div>
+        <button class="btn btn-sm" style="margin-left:auto;align-self:flex-start" onclick="openEditProfile()" data-i18n="edit_profile">${t('edit_profile')}</button>
+      </div>
+      <div class="profile-cards">
+        <div class="p-card">
+          <div class="p-card-title">${t('personal_info')} <span class="edit-link" onclick="openEditProfile()">${t('edit')}</span></div>
+          <div class="info-row"><span class="info-label">${t('label_email')}</span><span class="info-val" id="pf-email">${u.email||'—'}</span></div>
+          <div class="info-row"><span class="info-label">${t('label_dept')}</span><span class="info-val" id="pf-dept">${u.dept||'—'}</span></div>
+          <div class="info-row"><span class="info-label">${t('label_year')}</span><span class="info-val" id="pf-year">${u.year||'—'}</span></div>
+          <div class="info-row"><span class="info-label">${t('label_city')}</span><span class="info-val" id="pf-city">${u.city||'—'}</span></div>
+          <div class="info-row"><span class="info-label">LinkedIn</span><span class="info-val" id="pf-linkedin" style="color:var(--teal)">${u.linkedin||'—'}</span></div>
+        </div>
+        <div class="p-card">
+          <div class="p-card-title">${t('career_goals')} <span class="edit-link" onclick="openEditProfile()">${t('edit')}</span></div>
+          <div class="info-row"><span class="info-label">${t('label_goal')}</span><span class="info-val" id="pf-goal">${u.goal||'—'}</span></div>
+          <div class="info-row"><span class="info-label">${t('label_sector')}</span><span class="info-val" id="pf-sector">${u.sector||'—'}</span></div>
+          <div class="info-row"><span class="info-label">${t('label_skills')}</span><span class="info-val" id="pf-skills">${u.skills||'—'}</span></div>
+        </div>
+        <div class="p-card">
+          <div class="p-card-title">${t('mentor_activity')}</div>
+          <div class="info-row"><span class="info-label">${t('total_sessions')}</span><span class="info-val">4</span></div>
+          <div class="info-row"><span class="info-label">${t('active_mentors')}</span><span class="info-val">2</span></div>
+          <div class="info-row"><span class="info-label">${t('ai_sessions')}</span><span class="info-val">12</span></div>
+        </div>
+        <div class="p-card">
+          <div class="p-card-title">${t('skill_set')}</div>
+          <div class="info-row"><span class="info-label">${t('technical')}</span><span class="info-val">${u.skills||'—'}</span></div>
+          <div class="info-row"><span class="info-label">${t('label_city')}</span><span class="info-val">${u.city||'—'}</span></div>
+        </div>
+      </div>
+    `;
+  }
+}
+
+// ══════════════════════════════════════════════
+//  EDIT PROFILE MODAL
+// ══════════════════════════════════════════════
+function openEditProfile() {
+  const u = currentUser;
+  const fields = document.getElementById('editProfileFields');
+
+  if (u.type === 'company') {
+    fields.innerHTML = `
+      <div class="modal-group full"><label class="modal-label">${t('label_company_name')}</label><input class="modal-input" id="ep-cname" value="${u.name}"></div>
+      <div class="modal-group"><label class="modal-label">${t('label_sector')}</label><input class="modal-input" id="ep-csector" value="${u.sector||''}"></div>
+      <div class="modal-group"><label class="modal-label">${t('label_email')}</label><input class="modal-input" id="ep-cemail" value="${u.email||''}"></div>
+      <div class="modal-group"><label class="modal-label">${t('label_location')}</label><input class="modal-input" id="ep-ccity" value="${u.city||''}"></div>
+      <div class="modal-group"><label class="modal-label">${t('label_website')}</label><input class="modal-input" id="ep-cwebsite" value="${u.website||''}"></div>
+    `;
+  } else {
+    fields.innerHTML = `
+      <div class="modal-group"><label class="modal-label">${t('label_fullname')}</label><input class="modal-input" id="ep-name" value="${u.name}"></div>
+      <div class="modal-group"><label class="modal-label">${t('label_email')}</label><input class="modal-input" id="ep-email" value="${u.email||''}"></div>
+      <div class="modal-group"><label class="modal-label">${t('label_dept')}</label><input class="modal-input" id="ep-dept" value="${u.dept||''}"></div>
+      <div class="modal-group"><label class="modal-label">${t('label_year')}</label><input class="modal-input" id="ep-year" value="${u.year||''}"></div>
+      <div class="modal-group"><label class="modal-label">${t('label_uni')}</label><input class="modal-input" id="ep-uni" value="${u.uni||''}"></div>
+      <div class="modal-group"><label class="modal-label">${t('label_city')}</label><input class="modal-input" id="ep-city" value="${u.city||''}"></div>
+      <div class="modal-group full"><label class="modal-label">${t('label_goal')}</label><input class="modal-input" id="ep-goal" value="${u.goal||''}"></div>
+      <div class="modal-group"><label class="modal-label">${t('label_sector')}</label><input class="modal-input" id="ep-sector" value="${u.sector||''}"></div>
+      <div class="modal-group"><label class="modal-label">${t('label_skills')}</label><input class="modal-input" id="ep-skills" value="${u.skills||''}"></div>
+      <div class="modal-group full"><label class="modal-label">LinkedIn</label><input class="modal-input" id="ep-linkedin" value="${u.linkedin||''}"></div>
+    `;
+  }
+  document.getElementById('editProfileModal').style.display = 'flex';
+}
+
+function saveProfile() {
+  const u = currentUser;
+  if (u.type === 'company') {
+    u.name    = document.getElementById('ep-cname')?.value || u.name;
+    u.sector  = document.getElementById('ep-csector')?.value || u.sector;
+    u.email   = document.getElementById('ep-cemail')?.value || u.email;
+    u.city    = document.getElementById('ep-ccity')?.value || u.city;
+    u.website = document.getElementById('ep-cwebsite')?.value || u.website;
+    u.initials = u.name.slice(0,1).toUpperCase();
+  } else {
+    u.name    = document.getElementById('ep-name')?.value || u.name;
+    u.email   = document.getElementById('ep-email')?.value || u.email;
+    u.dept    = document.getElementById('ep-dept')?.value || u.dept;
+    u.year    = document.getElementById('ep-year')?.value || u.year;
+    u.uni     = document.getElementById('ep-uni')?.value || u.uni;
+    u.city    = document.getElementById('ep-city')?.value || u.city;
+    u.goal    = document.getElementById('ep-goal')?.value || u.goal;
+    u.sector  = document.getElementById('ep-sector')?.value || u.sector;
+    u.skills  = document.getElementById('ep-skills')?.value || u.skills;
+    u.linkedin= document.getElementById('ep-linkedin')?.value || u.linkedin;
+    u.initials = u.name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+  }
+  closeModal('editProfileModal');
+  updateNavUser();
+  renderProfile();
+  showToast(t('toast_profile_saved'));
+}
+
+// ══════════════════════════════════════════════
+//  MODALS & TOAST
+// ══════════════════════════════════════════════
+function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+
+function showToast(msg) {
+  const old = document.querySelector('.toast');
+  if (old) old.remove();
+  const t2 = document.createElement('div');
+  t2.className = 'toast';
+  t2.textContent = msg;
+  document.body.appendChild(t2);
+  setTimeout(()=>t2.remove(), 3000);
+}
+
+// ══════════════════════════════════════════════
+//  AI CHAT
+// ══════════════════════════════════════════════
+const modeConfig = {
+  mentor:    { get title(){ return t('mode_mentor_title');    }, get system(){ return buildSystem('mentor');    } },
+  roadmap:   { get title(){ return t('mode_roadmap_title');   }, get system(){ return buildSystem('roadmap');   } },
+  cv:        { get title(){ return t('mode_cv_title');        }, get system(){ return buildSystem('cv');        } },
+  salary:    { get title(){ return t('mode_salary_title');    }, get system(){ return buildSystem('salary');    } },
+  interview: { get title(){ return t('mode_interview_title'); }, get system(){ return buildSystem('interview'); } },
+  sector:    { get title(){ return t('mode_sector_title');    }, get system(){ return buildSystem('sector');    } },
+};
+
+function buildSystem(mode) {
+  const lang = currentLang;
+  const u = currentUser||demoAccounts.student;
+  const langNote = lang==='en' ? 'Respond in English.' : 'Türkçe cevap ver.';
+  const base = `You are AlumniConnect's AI career assistant. User: ${u.name}. ${langNote}`;
+  const systems = {
+    mentor:    base + ` Help match them with the best alumni mentors. Alumni: Selin Kaya (PM at Getir, 94% match), Mert Özdemir (SWE at Trendyol, 88%), Ayşe Türk (DS at Yapı Kredi, 81%). Be concrete and motivating.`,
+    roadmap:   base + ` Create detailed, actionable career roadmaps with time frames, technologies, and certifications to learn.`,
+    cv:        base + ` Analyze CVs, give concrete improvement suggestions, write example bullet points.`,
+    salary:    base + ` Share Turkey software sector salary data (2024-2025). Give realistic ranges by company, experience, city.`,
+    interview: base + ` Coach for interviews. Ask questions, analyze answers, teach STAR method. User targets PM roles.`,
+    sector:    base + ` Analyze Turkish & global tech sector. Share 2024-2025 trends, growing sectors, in-demand roles.`,
+  };
+  return systems[mode];
+}
+
+function setMode(mode, el) {
+  currentMode = mode;
+  chatHistory = [];
+  document.querySelectorAll('.option-item').forEach(i=>i.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('chatTitle').textContent = modeConfig[mode].title;
+  const msgs = document.getElementById('chatMessages');
+  msgs.innerHTML = `<div class="msg ai"><div class="msg-avatar msg-ai-av">✦</div><div class="msg-bubble"><p>${t('mode_changed')}: <strong>${modeConfig[mode].title}</strong></p><p>${t('mode_help')}</p></div></div>`;
+}
+
+function sendQuick(text) { document.getElementById('chatInput').value = text; sendMessage(); }
+function handleKey(e) { if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMessage();} }
+function autoResize(el) { el.style.height='auto'; el.style.height=Math.min(el.scrollHeight,120)+'px'; }
+
+async function sendMessage() {
+  if (isLoading) return;
+  const input = document.getElementById('chatInput');
+  const text = input.value.trim();
+  if (!text) return;
+  input.value=''; input.style.height='auto';
+  addUserMsg(text);
+  chatHistory.push({role:'user',content:text});
+  isLoading = true;
+  document.getElementById('sendBtn').disabled = true;
+  const typingId = addTyping();
+  try {
+    const resp = await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,system:modeConfig[currentMode].system,messages:chatHistory})
+    });
+    removeTyping(typingId);
+    const data = await resp.json();
+    const reply = data.content?.map(b=>b.text||'').join('')||t('error_generic');
+    chatHistory.push({role:'assistant',content:reply});
+    addAIMsg(reply);
+  } catch(err) {
+    removeTyping(typingId);
+    addAIMsg(t('error_conn'));
+  }
+  isLoading=false;
+  document.getElementById('sendBtn').disabled=false;
+}
+
+function addUserMsg(text) {
+  const msgs=document.getElementById('chatMessages');
+  const div=document.createElement('div'); div.className='msg user';
+  div.innerHTML=`<div class="msg-avatar msg-user-av">${currentUser?.initials||'U'}</div><div class="msg-bubble">${escHtml(text)}</div>`;
+  msgs.appendChild(div); msgs.scrollTop=msgs.scrollHeight;
+}
+
+function addAIMsg(text) {
+  const msgs=document.getElementById('chatMessages');
+  const div=document.createElement('div'); div.className='msg ai';
+  div.innerHTML=`<div class="msg-avatar msg-ai-av">✦</div><div class="msg-bubble">${formatMsg(text)}</div>`;
+  msgs.appendChild(div); msgs.scrollTop=msgs.scrollHeight;
+}
+
+function addTyping() {
+  const msgs=document.getElementById('chatMessages');
+  const id='typing-'+Date.now();
+  const div=document.createElement('div'); div.className='msg ai'; div.id=id;
+  div.innerHTML=`<div class="msg-avatar msg-ai-av">✦</div><div class="typing-indicator"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div>`;
+  msgs.appendChild(div); msgs.scrollTop=msgs.scrollHeight; return id;
+}
+
+function removeTyping(id){const el=document.getElementById(id);if(el)el.remove();}
+
+function formatMsg(text){
+  return text
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')
+    .replace(/\*(.*?)\*/g,'<em>$1</em>')
+    .replace(/^#{1,3} (.+)$/gm,'<strong>$1</strong>')
+    .replace(/^[-•] (.+)/gm,'<li>$1</li>')
+    .replace(/(<li>[\s\S]*?<\/li>)/g,'<ul>$1</ul>')
+    .replace(/\n\n/g,'</p><p>').replace(/\n/g,'<br>')
+    .replace(/^([^<].+)$/,'<p>$1</p>');
+}
+
+function escHtml(t2){return t2.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+// ══════════════════════════════════════════════
+//  i18n
+// ══════════════════════════════════════════════
+const i18n = {
+  tr: {
+    portal_tagline:'AI Destekli Kariyer & Mezun Platformu',
+    ptype_student:'Öğrenci / Mezun', ptype_company:'Şirket',
+    ptab_login:'Giriş Yap', ptab_register:'Kayıt Ol',
+    label_email:'E-posta', label_password:'Şifre', label_fullname:'Ad Soyad',
+    label_dept:'Bölüm', label_type:'Tür', label_company_name:'Şirket Adı',
+    label_sector:'Sektör', label_year:'Sınıf / Yıl', label_uni:'Üniversite',
+    label_city:'Şehir', label_goal:'Kariyer Hedefi', label_skills:'Beceriler',
+    label_website:'Web Sitesi', label_location:'Lokasyon', label_salary:'Maaş Aralığı',
+    label_job_title:'Pozisyon Başlığı', label_job_type:'İlan Türü',
+    label_description:'Açıklama', label_requirements:'Gereksinimler',
+    label_cover:'Ön Yazı', label_cv_link:'CV Linki',
+    label_company_account:'Şirket Hesabı', label_goal:'Kariyer Hedefi',
+    ph_email:'ornek@universite.edu.tr', ph_password:'••••••••',
+    ph_fullname:'Ahmet Yılmaz', ph_dept:'Bilgisayar Mühendisliği',
+    ph_sector:'E-ticaret / Teknoloji', ph_job_search:'İlan ara...',
+    ph_job_title:'Senior Frontend Developer', ph_dept_eng:'Mühendislik',
+    ph_job_desc:'Pozisyon hakkında kısa açıklama...', ph_reqs:'React, TypeScript, 3+ yıl',
+    ph_cover:'Neden bu pozisyon için uygunsunuz?', 
+    opt_student:'Öğrenci', opt_alumni:'Mezun',
+    btn_login:'Giriş Yap', btn_register:'Kayıt Ol',
+    demo_student:'Demo: Öğrenci girişi', demo_company:'Demo: Şirket girişi',
+    err_fill:'Lütfen tüm alanları doldurun.',
+    nav_explore:'Keşfet', nav_jobs:'İlanlar', nav_ai:'AI Kariyer',
+    nav_messages:'Mesajlar', nav_profile:'Profil',
+    company_badge:'ŞİRKET',
+    hero_tag:'AI Destekli Kariyer Platformu',
+    hero_title:'Kariyerine <em>yön ver</em>,<br>mezunlarla bağlan.',
+    hero_sub:'AI destekli eşleştirme ile sana en uygun mentorları buluyoruz.',
+    hero_btn1:'AI ile Kariyer Planla', hero_btn2:'İlanları Gör',
+    stat1:'Aktif Mezun', stat2:'Eşleştirme Başarısı', stat3:'Şirket Ortağı',
+    suggested_alumni:'Sana Önerilen Mezunlar',
+    match_label:'eşleşme', send_msg:'Mesaj Gönder',
+    filter_all:'Tümü', filter_fulltime:'Tam Zamanlı', filter_intern:'Staj', filter_remote:'Uzaktan',
+    badge_new:'Yeni', job_select_prompt:'Bir ilan seçin',
+    btn_apply_now:'Hemen Başvur', btn_contact_company:'Şirkete Yaz',
+    job_desc_title:'Pozisyon Açıklaması', job_reqs_title:'Gereksinimler',
+    job_poster_title:'İlanı Paylaşan Alumni',
+    poster_alumni_label:'Çalışan Alumni',
+    cds_active:'Aktif İlan', cds_apps:'Başvuru', cds_msgs:'Mesaj', cds_alumni:'Çalışan Alumni',
+    my_postings:'İlanlarım', btn_post_job:'+ Yeni İlan',
+    btn_edit:'Düzenle', btn_delete:'Sil',
+    modal_edit_title:'Profili Düzenle', modal_post_job:'Yeni İlan Oluştur',
+    modal_apply:'Başvur', btn_apply:'Başvuruyu Gönder',
+    btn_cancel:'İptal', btn_save:'Kaydet', btn_close:'Kapat',
+    opt_fulltime:'Tam Zamanlı', opt_intern:'Staj', opt_remote:'Uzaktan',
+    apply_success_title:'Başvurunuz Alındı!',
+    apply_success_sub:'Şirket en kısa sürede sizinle iletişime geçecek.',
+    apply_auto_msg:'Başvurunuzu aldık, en kısa sürede dönüş yapacağız.',
+    ai_sidebar_title:'AI Kariyer Asistanı', ai_sidebar_sub:'Claude ile güçlendirilmiş',
+    mode_mentor_title:'Mentor Eşleştirme', mode_mentor_sub:'En uygun mezunu bul',
+    mode_roadmap_title:'Kariyer Yol Haritası', mode_roadmap_sub:'Hedefine adım adım',
+    mode_cv_title:'CV Analizi', mode_cv_sub:"CV'ni güçlendir",
+    mode_salary_title:'Maaş Rehberi', mode_salary_sub:'Sektör maaşlarını öğren',
+    mode_interview_title:'Mülakat Hazırlığı', mode_interview_sub:'Sorular ve teknikler',
+    mode_sector_title:'Sektör Analizi', mode_sector_sub:'Trend ve fırsatlar',
+    chat_header_sub:'Sana en uygun mezunları buluyorum',
+    qp1:'Yazılım kariyeri planla', qp1_msg:'Yazılım sektöründe kariyer planı oluştur',
+    qp2:'Mentor öner', qp2_msg:'Bana uygun mentor öner',
+    qp3:'CV güçlendir', qp3_msg:"CV'mi nasıl güçlendirebilirim?",
+    qp4:'Sektör trendleri', qp4_msg:'2025 iş piyasasındaki trendler neler?',
+    chat_placeholder:'Sorunuzu yazın...',
+    greeting:"Merhaba! 👋 Ben AlumniConnect'in AI kariyer asistanıyım.",
+    greeting2:"Sana en uygun mezunları bulmak, kariyer yol haritası oluşturmak veya CV'ni analiz etmek için buradayım.",
+    greeting3:'Nasıl yardımcı olabilirim?',
+    mode_changed:'Mod değiştirildi', mode_help:'Bu konuda sana nasıl yardımcı olabilirim?',
+    error_conn:'Bağlantı hatası. Tekrar deneyin.', error_generic:'Üzgünüm, bir hata oluştu.',
+    messages_title:'Mesajlar', select_conv:'Bir konuşma seçin',
+    online:'Çevrimiçi', dm_placeholder:'Mesaj yaz...', dm_intro:'Merhaba! Kariyer yolculuğunuzda yardımcı olmaktan mutluluk duyarım.', now:'Şimdi',
+    edit_profile:'Profili Düzenle', edit:'Düzenle',
+    personal_info:'Kişisel Bilgiler', career_goals:'Kariyer Hedefleri',
+    mentor_activity:'Mentor Aktivitesi', skill_set:'Beceri Seti',
+    total_sessions:'Toplam Görüşme', active_mentors:'Aktif Mentor', ai_sessions:'AI Oturum',
+    technical:'Teknik', activity:'Aktivite', company_info:'Şirket Bilgileri',
+    toast_profile_saved:'Profil başarıyla kaydedildi ✓',
+    toast_job_posted:'İlan yayınlandı ✓',
+    toast_job_deleted:'İlan silindi.',
+    toast_edit_coming:'Düzenleme özelliği yakında eklenecek.',
+  },
+  en: {
+    portal_tagline:'AI-Powered Career & Alumni Platform',
+    ptype_student:'Student / Alumni', ptype_company:'Company',
+    ptab_login:'Sign In', ptab_register:'Register',
+    label_email:'Email', label_password:'Password', label_fullname:'Full Name',
+    label_dept:'Department', label_type:'Type', label_company_name:'Company Name',
+    label_sector:'Sector', label_year:'Year / Class', label_uni:'University',
+    label_city:'City', label_goal:'Career Goal', label_skills:'Skills',
+    label_website:'Website', label_location:'Location', label_salary:'Salary Range',
+    label_job_title:'Position Title', label_job_type:'Job Type',
+    label_description:'Description', label_requirements:'Requirements',
+    label_cover:'Cover Letter', label_cv_link:'CV Link',
+    label_company_account:'Company Account',
+    ph_email:'example@university.edu', ph_password:'••••••••',
+    ph_fullname:'John Smith', ph_dept:'Computer Engineering',
+    ph_sector:'E-commerce / Technology', ph_job_search:'Search jobs...',
+    ph_job_title:'Senior Frontend Developer', ph_dept_eng:'Engineering',
+    ph_job_desc:'Brief description of the position...', ph_reqs:'React, TypeScript, 3+ years',
+    ph_cover:'Why are you a good fit for this role?',
+    opt_student:'Student', opt_alumni:'Alumni',
+    btn_login:'Sign In', btn_register:'Register',
+    demo_student:'Demo: Student login', demo_company:'Demo: Company login',
+    err_fill:'Please fill in all fields.',
+    nav_explore:'Explore', nav_jobs:'Jobs', nav_ai:'AI Career',
+    nav_messages:'Messages', nav_profile:'Profile',
+    company_badge:'COMPANY',
+    hero_tag:'AI-Powered Career Platform',
+    hero_title:'<em>Shape</em> your career,<br>connect with alumni.',
+    hero_sub:'AI-powered matching finds the most suitable mentors for you.',
+    hero_btn1:'Plan Career with AI', hero_btn2:'Browse Jobs',
+    stat1:'Active Alumni', stat2:'Match Success Rate', stat3:'Partner Companies',
+    suggested_alumni:'Recommended Alumni for You',
+    match_label:'match', send_msg:'Send Message',
+    filter_all:'All', filter_fulltime:'Full Time', filter_intern:'Internship', filter_remote:'Remote',
+    badge_new:'New', job_select_prompt:'Select a job posting',
+    btn_apply_now:'Apply Now', btn_contact_company:'Contact Company',
+    job_desc_title:'Job Description', job_reqs_title:'Requirements',
+    job_poster_title:'Posted by Alumni',
+    poster_alumni_label:'Alumni Employee',
+    cds_active:'Active Listings', cds_apps:'Applications', cds_msgs:'Messages', cds_alumni:'Alumni Employees',
+    my_postings:'My Postings', btn_post_job:'+ New Posting',
+    btn_edit:'Edit', btn_delete:'Delete',
+    modal_edit_title:'Edit Profile', modal_post_job:'Create New Posting',
+    modal_apply:'Apply', btn_apply:'Submit Application',
+    btn_cancel:'Cancel', btn_save:'Save', btn_close:'Close',
+    opt_fulltime:'Full Time', opt_intern:'Internship', opt_remote:'Remote',
+    apply_success_title:'Application Received!',
+    apply_success_sub:'The company will get back to you shortly.',
+    apply_auto_msg:'We received your application and will respond soon.',
+    ai_sidebar_title:'AI Career Assistant', ai_sidebar_sub:'Powered by Claude',
+    mode_mentor_title:'Mentor Matching', mode_mentor_sub:'Find your best mentor',
+    mode_roadmap_title:'Career Roadmap', mode_roadmap_sub:'Step-by-step to your goal',
+    mode_cv_title:'CV Analysis', mode_cv_sub:'Strengthen your CV',
+    mode_salary_title:'Salary Guide', mode_salary_sub:'Industry salary insights',
+    mode_interview_title:'Interview Prep', mode_interview_sub:'Questions & techniques',
+    mode_sector_title:'Sector Analysis', mode_sector_sub:'Trends & opportunities',
+    chat_header_sub:'Finding the best alumni matches for you',
+    qp1:'Plan software career', qp1_msg:'Create a career plan for the software industry',
+    qp2:'Recommend mentor', qp2_msg:'Recommend a suitable mentor for me',
+    qp3:'Strengthen CV', qp3_msg:'How can I strengthen my CV?',
+    qp4:'Industry trends', qp4_msg:'What are the job market trends in 2025?',
+    chat_placeholder:'Type your question...',
+    greeting:"Hello! 👋 I'm AlumniConnect's AI career assistant.",
+    greeting2:"I'm here to find the best alumni for you, create a career roadmap, or analyze your CV.",
+    greeting3:'How can I help you?',
+    mode_changed:'Mode changed', mode_help:'How can I help you with this topic?',
+    error_conn:'Connection error. Please try again.', error_generic:'Sorry, an error occurred.',
+    messages_title:'Messages', select_conv:'Select a conversation',
+    online:'Online', dm_placeholder:'Write a message...', dm_intro:"Hi! I'd be happy to help you on your career journey.", now:'Now',
+    edit_profile:'Edit Profile', edit:'Edit',
+    personal_info:'Personal Information', career_goals:'Career Goals',
+    mentor_activity:'Mentor Activity', skill_set:'Skill Set',
+    total_sessions:'Total Sessions', active_mentors:'Active Mentors', ai_sessions:'AI Sessions',
+    technical:'Technical', activity:'Activity', company_info:'Company Information',
+    toast_profile_saved:'Profile saved successfully ✓',
+    toast_job_posted:'Job posted successfully ✓',
+    toast_job_deleted:'Job deleted.',
+    toast_edit_coming:'Edit feature coming soon.',
+  }
+};
+
+function t(key){ return i18n[currentLang][key] || i18n.tr[key] || key; }
+
+function setLang(lang) {
+  currentLang = lang;
+  document.getElementById('btn-tr').classList.toggle('active', lang==='tr');
+  document.getElementById('btn-en').classList.toggle('active', lang==='en');
+  document.documentElement.lang = lang;
+  document.querySelectorAll('[data-i18n]').forEach(el=>{ const k=el.getAttribute('data-i18n'); if(i18n[lang][k])el.textContent=i18n[lang][k]; });
+  document.querySelectorAll('[data-i18n-html]').forEach(el=>{ const k=el.getAttribute('data-i18n-html'); if(i18n[lang][k])el.innerHTML=i18n[lang][k]; });
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(el=>{ const k=el.getAttribute('data-i18n-placeholder'); if(i18n[lang][k])el.placeholder=i18n[lang][k]; });
+  renderAlumni();
+  renderConversations();
+  if (currentUser) { renderProfile(); renderJobsView(); }
+}
+</script>
+</body>
+</html>
