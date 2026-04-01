@@ -1,0 +1,1994 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ALCOP — Alumni Connect Platform</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0a0a0f;
+  --surface:#111118;
+  --surface2:#1a1a24;
+  --surface3:#22222e;
+  --border:rgba(255,255,255,.07);
+  --border2:rgba(255,255,255,.12);
+  --text:#f0f0f8;
+  --text2:rgba(240,240,248,.6);
+  --text3:rgba(240,240,248,.35);
+  --accent:#6c63ff;
+  --accent2:#8b85ff;
+  --accent-glow:rgba(108,99,255,.25);
+  --green:#22c55e;
+  --green-bg:rgba(34,197,94,.1);
+  --amber:#f59e0b;
+  --amber-bg:rgba(245,158,11,.1);
+  --red:#ef4444;
+  --red-bg:rgba(239,68,68,.1);
+  --blue:#3b82f6;
+  --blue-bg:rgba(59,130,246,.1);
+  --pink:#ec4899;
+  --pink-bg:rgba(236,72,153,.1);
+  --r-sm:8px; --r-md:12px; --r-lg:16px; --r-xl:20px; --r-2xl:24px;
+  --shadow:0 4px 24px rgba(0,0,0,.4);
+  --shadow-lg:0 8px 48px rgba(0,0,0,.6);
+  --transition:.18s cubic-bezier(.4,0,.2,1);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);font-size:14px;line-height:1.6;overflow-x:hidden}
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--surface3);border-radius:2px}
+::selection{background:var(--accent);color:white}
+
+/* ── ANIMATIONS ── */
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes slideUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
+@keyframes typing{0%,60%,100%{opacity:.3;transform:translateY(0)}30%{opacity:1;transform:translateY(-3px)}}
+@keyframes glow{0%,100%{box-shadow:0 0 20px var(--accent-glow)}50%{box-shadow:0 0 40px var(--accent-glow),0 0 60px var(--accent-glow)}}
+
+/* ── PORTAL ── */
+#portalScreen{
+  position:fixed;inset:0;z-index:1000;
+  background:var(--bg);
+  display:flex;align-items:center;justify-content:center;
+  animation:fadeIn .5s ease;
+  overflow:hidden;
+}
+.portal-bg{
+  position:absolute;inset:0;pointer-events:none;overflow:hidden;
+}
+.portal-orb{
+  position:absolute;border-radius:50%;filter:blur(80px);opacity:.15;
+}
+.portal-orb-1{width:500px;height:500px;background:var(--accent);top:-100px;right:-100px;}
+.portal-orb-2{width:400px;height:400px;background:#ec4899;bottom:-80px;left:-80px;}
+.portal-orb-3{width:300px;height:300px;background:#3b82f6;top:40%;left:30%;}
+
+.portal-wrap{
+  display:flex;width:100%;max-width:900px;height:580px;
+  border-radius:var(--r-2xl);overflow:hidden;border:1px solid var(--border2);
+  box-shadow:var(--shadow-lg);animation:slideUp .5s ease;
+  position:relative;z-index:1;
+}
+.portal-left{
+  flex:1;background:linear-gradient(135deg,#13131e 0%,#1a1030 50%,#0f1a2e 100%);
+  padding:48px 40px;display:flex;flex-direction:column;justify-content:space-between;
+  position:relative;overflow:hidden;
+}
+.portal-left::before{
+  content:'';position:absolute;inset:0;
+  background:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%236c63ff' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+}
+.portal-brand{position:relative}
+.portal-logo{font-family:'Syne',sans-serif;font-size:28px;font-weight:800;letter-spacing:-0.5px;margin-bottom:4px}
+.portal-logo .accent{background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.portal-fullname{font-size:11px;color:var(--text3);letter-spacing:1px;text-transform:uppercase}
+.portal-hero{position:relative}
+.portal-hero-title{font-family:'Syne',sans-serif;font-size:32px;font-weight:700;line-height:1.2;margin-bottom:16px;color:var(--text)}
+.portal-hero-sub{font-size:13px;color:var(--text2);line-height:1.7;margin-bottom:28px}
+.portal-stats{display:flex;gap:24px}
+.pstat{text-align:left}
+.pstat-num{font-family:'Syne',sans-serif;font-size:22px;font-weight:700;color:var(--accent2)}
+.pstat-lbl{font-size:11px;color:var(--text3)}
+.portal-badges{display:flex;flex-wrap:wrap;gap:8px;margin-top:24px}
+.pbadge{display:flex;align-items:center;gap:6px;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:20px;padding:5px 12px;font-size:11px;color:var(--text2)}
+.pbadge svg{width:13px;height:13px;opacity:.6}
+
+.portal-right{
+  width:420px;background:var(--surface);
+  padding:40px 36px;display:flex;flex-direction:column;
+  overflow-y:auto;
+}
+.portal-type-toggle{
+  display:flex;background:var(--surface2);border-radius:var(--r-md);padding:3px;gap:2px;margin-bottom:28px;border:1px solid var(--border);
+}
+.ptype-btn{
+  flex:1;padding:8px 12px;border-radius:9px;font-size:12px;font-weight:600;
+  cursor:pointer;border:none;background:transparent;color:var(--text3);
+  transition:all var(--transition);font-family:'Inter',sans-serif;
+  display:flex;align-items:center;justify-content:center;gap:6px;letter-spacing:.2px;
+}
+.ptype-btn svg{width:14px;height:14px}
+.ptype-btn.active{background:var(--accent);color:white;box-shadow:0 2px 12px var(--accent-glow)}
+.ptype-btn:not(.active):hover{color:var(--text)}
+
+.portal-tab-row{display:flex;border-bottom:1px solid var(--border);margin-bottom:24px}
+.ptab{flex:1;padding:10px;font-size:13px;font-weight:500;cursor:pointer;border:none;
+  background:transparent;color:var(--text3);transition:all var(--transition);
+  font-family:'Inter',sans-serif;border-bottom:2px solid transparent;margin-bottom:-1px}
+.ptab.active{color:var(--accent2);border-bottom-color:var(--accent)}
+.ptab:hover:not(.active){color:var(--text2)}
+
+.pform-title{font-family:'Syne',sans-serif;font-size:20px;font-weight:700;margin-bottom:6px}
+.pform-sub{font-size:12px;color:var(--text3);margin-bottom:20px}
+.pform-group{display:flex;flex-direction:column;gap:5px;margin-bottom:14px}
+.pform-label{font-size:11px;color:var(--text3);font-weight:600;letter-spacing:.3px;text-transform:uppercase}
+.pform-input-wrap{position:relative}
+.pform-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);width:16px;height:16px;color:var(--text3);pointer-events:none}
+.pform-input{
+  width:100%;padding:10px 12px 10px 38px;border-radius:var(--r-md);
+  border:1px solid var(--border2);background:var(--surface2);color:var(--text);
+  font-size:13px;font-family:'Inter',sans-serif;outline:none;transition:border-color var(--transition);
+}
+.pform-input::placeholder{color:var(--text3)}
+.pform-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-glow)}
+.pform-select{
+  width:100%;padding:10px 12px;border-radius:var(--r-md);
+  border:1px solid var(--border2);background:var(--surface2);color:var(--text);
+  font-size:13px;font-family:'Inter',sans-serif;outline:none;
+}
+.pform-select option{background:var(--surface2)}
+.portal-divider{display:flex;align-items:center;gap:12px;margin:16px 0;font-size:11px;color:var(--text3)}
+.portal-divider::before,.portal-divider::after{content:'';flex:1;height:1px;background:var(--border)}
+.portal-submit{
+  width:100%;padding:12px;border-radius:var(--r-md);
+  background:linear-gradient(135deg,var(--accent),var(--accent2));color:white;
+  font-size:13px;font-weight:600;cursor:pointer;border:none;
+  font-family:'Inter',sans-serif;transition:all var(--transition);
+  box-shadow:0 4px 16px var(--accent-glow);letter-spacing:.2px;
+}
+.portal-submit:hover{transform:translateY(-1px);box-shadow:0 6px 24px var(--accent-glow)}
+.portal-err{font-size:12px;color:var(--red);min-height:16px;margin-bottom:4px}
+.portal-demo{display:flex;gap:8px;flex-wrap:wrap;margin-top:20px}
+.demo-btn{
+  flex:1;padding:8px 12px;border-radius:var(--r-md);font-size:11px;font-weight:500;
+  cursor:pointer;border:1px solid var(--border2);background:var(--surface2);
+  color:var(--text2);font-family:'Inter',sans-serif;transition:all var(--transition);
+  display:flex;align-items:center;gap:6px;justify-content:center;
+}
+.demo-btn:hover{border-color:var(--accent);color:var(--accent2)}
+.demo-btn svg{width:13px;height:13px}
+
+/* ── NAV ── */
+.app{display:flex;flex-direction:column;min-height:100vh}
+nav{
+  height:56px;padding:0 24px;display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:100;
+  background:rgba(10,10,15,.85);backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border);
+}
+.nav-logo{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;cursor:pointer;letter-spacing:-.3px;display:flex;align-items:center;gap:8px}
+.nav-logo .dot{width:8px;height:8px;border-radius:50%;background:var(--accent);box-shadow:0 0 8px var(--accent)}
+.nav-logo .accent{background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.nav-tabs{display:flex;gap:2px;background:var(--surface2);border-radius:var(--r-md);padding:3px;border:1px solid var(--border)}
+.nav-tab{
+  padding:5px 14px;border-radius:var(--r-sm);font-size:12px;font-weight:500;
+  cursor:pointer;color:var(--text3);border:none;background:transparent;
+  transition:all var(--transition);font-family:'Inter',sans-serif;
+}
+.nav-tab.active{background:var(--surface3);color:var(--text);border:1px solid var(--border2)}
+.nav-tab:hover:not(.active){color:var(--text2)}
+.nav-right{display:flex;align-items:center;gap:10px}
+
+.lang-toggle{display:flex;background:var(--surface2);border:1px solid var(--border);border-radius:20px;padding:2px;gap:1px}
+.lang-btn{padding:4px 10px;border-radius:16px;font-size:11px;font-weight:700;cursor:pointer;border:none;background:transparent;color:var(--text3);transition:all var(--transition);font-family:'Inter',sans-serif;letter-spacing:.5px}
+.lang-btn.active{background:var(--accent);color:white;box-shadow:0 2px 8px var(--accent-glow)}
+
+.user-pill{display:flex;align-items:center;gap:8px;background:var(--surface2);border:1px solid var(--border);border-radius:20px;padding:4px 12px 4px 4px;font-size:12px;cursor:pointer;transition:all var(--transition)}
+.user-pill:hover{border-color:var(--accent)}
+.nav-av{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:white}
+.company-badge{font-size:9px;padding:1px 6px;border-radius:8px;background:var(--accent-glow);color:var(--accent2);font-weight:700;letter-spacing:.5px}
+
+/* ── PAGES ── */
+.page{display:none;flex:1;flex-direction:column}
+.page.active{display:flex}
+
+/* ── HOME ── */
+.home-hero{
+  background:var(--surface);padding:56px 48px;position:relative;overflow:hidden;
+  border-bottom:1px solid var(--border);
+}
+.hero-grid-bg{
+  position:absolute;inset:0;pointer-events:none;
+  background-image:linear-gradient(var(--border) 1px,transparent 1px),linear-gradient(90deg,var(--border) 1px,transparent 1px);
+  background-size:48px 48px;opacity:.4;
+}
+.hero-orb{position:absolute;border-radius:50%;filter:blur(80px);pointer-events:none}
+.hero-orb-1{width:400px;height:400px;background:var(--accent);opacity:.08;top:-100px;right:-50px}
+.hero-orb-2{width:300px;height:300px;background:#ec4899;opacity:.06;bottom:-50px;left:100px}
+.hero-inner{position:relative;z-index:1;max-width:680px}
+.hero-badge{
+  display:inline-flex;align-items:center;gap:8px;
+  background:var(--accent-glow);border:1px solid rgba(108,99,255,.3);
+  border-radius:20px;padding:5px 14px;font-size:11px;color:var(--accent2);
+  margin-bottom:20px;font-weight:600;letter-spacing:.3px;
+}
+.hero-badge::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--accent);animation:pulse 2s infinite}
+.hero-title{font-family:'Syne',sans-serif;font-size:44px;font-weight:800;line-height:1.1;margin-bottom:16px;letter-spacing:-1px}
+.hero-title em{background:linear-gradient(135deg,var(--accent),var(--accent2),#ec4899);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;font-style:italic}
+.hero-sub{font-size:15px;color:var(--text2);margin-bottom:32px;max-width:480px;line-height:1.7}
+.hero-btns{display:flex;gap:12px;flex-wrap:wrap}
+.btn-primary{padding:11px 24px;border-radius:var(--r-md);background:var(--accent);color:white;font-size:13px;font-weight:600;cursor:pointer;border:none;transition:all var(--transition);font-family:'Inter',sans-serif;box-shadow:0 4px 16px var(--accent-glow)}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 6px 24px var(--accent-glow)}
+.btn-secondary{padding:11px 24px;border-radius:var(--r-md);background:var(--surface3);color:var(--text);font-size:13px;font-weight:500;cursor:pointer;border:1px solid var(--border2);transition:all var(--transition);font-family:'Inter',sans-serif}
+.btn-secondary:hover{border-color:var(--accent);color:var(--accent2)}
+
+.home-content{padding:40px 48px;flex:1}
+.section-title{font-family:'Syne',sans-serif;font-size:22px;font-weight:700;margin-bottom:20px;letter-spacing:-.3px}
+.section-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
+
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:40px}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:20px;text-align:center;transition:all var(--transition)}
+.stat-card:hover{border-color:var(--border2);transform:translateY(-2px)}
+.stat-num{font-family:'Syne',sans-serif;font-size:32px;font-weight:800;margin-bottom:4px;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.stat-lbl{font-size:12px;color:var(--text3);font-weight:500}
+
+.alumni-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:14px;margin-bottom:40px}
+.alumni-card{
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);
+  padding:20px;cursor:pointer;transition:all var(--transition);position:relative;overflow:hidden;
+}
+.alumni-card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,var(--accent-glow),transparent);opacity:0;transition:opacity var(--transition)}
+.alumni-card:hover{border-color:var(--border2);transform:translateY(-2px);box-shadow:0 8px 32px rgba(0,0,0,.3)}
+.alumni-card:hover::before{opacity:1}
+.alumni-card-top{display:flex;gap:12px;align-items:flex-start;margin-bottom:12px;position:relative}
+.alumni-av{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;flex-shrink:0;color:white;border:2px solid rgba(255,255,255,.1)}
+.alumni-name{font-weight:600;font-size:14px;margin-bottom:2px}
+.alumni-role-small{font-size:11px;color:var(--text3)}
+.alumni-company{font-size:12px;color:var(--accent2);font-weight:500;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.alumni-company::before{content:'';width:4px;height:4px;border-radius:50%;background:var(--accent2)}
+.alumni-tags{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:14px}
+.tag{font-size:10px;padding:2px 8px;border-radius:20px;background:var(--surface2);border:1px solid var(--border);color:var(--text3)}
+.match-badge{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:700;padding:3px 8px;border-radius:20px;letter-spacing:.3px}
+.match-high{background:var(--green-bg);color:var(--green)}
+.match-med{background:var(--amber-bg);color:var(--amber)}
+.card-footer{display:flex;justify-content:space-between;align-items:center}
+.btn-sm{padding:5px 12px;border-radius:var(--r-sm);font-size:11px;font-weight:500;cursor:pointer;border:1px solid var(--border2);background:var(--surface2);color:var(--text2);transition:all var(--transition);font-family:'Inter',sans-serif}
+.btn-sm:hover{background:var(--accent);color:white;border-color:var(--accent)}
+
+/* ── JOBS ── */
+.jobs-layout{display:flex;flex:1;overflow:hidden;height:calc(100vh - 56px)}
+.jobs-sidebar{width:300px;border-right:1px solid var(--border);background:var(--surface);display:flex;flex-direction:column;flex-shrink:0;overflow-y:auto}
+.jobs-sidebar-header{padding:16px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--surface);z-index:10}
+.jobs-search{
+  width:100%;padding:9px 12px 9px 36px;border:1px solid var(--border2);border-radius:var(--r-md);
+  font-size:12px;font-family:'Inter',sans-serif;background:var(--surface2);color:var(--text);
+  outline:none;margin-bottom:10px;position:relative;
+}
+.jobs-search:focus{border-color:var(--accent)}
+.search-wrap{position:relative}
+.search-icon{position:absolute;left:10px;top:50%;transform:translateY(-50%);width:14px;height:14px;color:var(--text3);pointer-events:none}
+.jobs-filter-row{display:flex;gap:5px;flex-wrap:wrap}
+.filter-chip{font-size:10px;padding:3px 10px;border-radius:20px;border:1px solid var(--border);background:var(--surface2);color:var(--text3);cursor:pointer;transition:all var(--transition);font-family:'Inter',sans-serif;font-weight:500}
+.filter-chip.active{background:var(--accent);color:white;border-color:var(--accent)}
+.filter-chip:hover:not(.active){border-color:var(--border2);color:var(--text2)}
+
+.job-list-item{padding:14px 16px;border-bottom:1px solid var(--border);cursor:pointer;transition:background var(--transition)}
+.job-list-item:hover{background:var(--surface2)}
+.job-list-item.active{background:var(--surface2);border-left:2px solid var(--accent)}
+.jli-company{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.company-logo{width:28px;height:28px;border-radius:var(--r-sm);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:10px;color:white;flex-shrink:0}
+.jli-company-name{font-size:11px;color:var(--text3)}
+.jli-title{font-size:13px;font-weight:600;margin-bottom:5px;color:var(--text)}
+.jli-meta{display:flex;gap:6px;flex-wrap:wrap}
+.jli-tag{font-size:10px;padding:2px 7px;border-radius:20px}
+.jt-type{background:var(--blue-bg);color:var(--blue)}
+.jt-loc{background:var(--surface3);color:var(--text3)}
+.jt-new{background:var(--green-bg);color:var(--green)}
+.jt-salary{background:var(--amber-bg);color:var(--amber)}
+.jt-dept{background:var(--surface3);color:var(--text3)}
+
+.job-detail{flex:1;overflow-y:auto;padding:28px;background:var(--bg)}
+.job-detail-empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--text3);gap:12px;height:100%}
+.jde-icon{width:60px;height:60px;border-radius:var(--r-xl);background:var(--surface2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center}
+.job-detail-header{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-xl);padding:24px;margin-bottom:16px}
+.jdh-top{display:flex;align-items:flex-start;gap:16px;margin-bottom:16px}
+.company-logo-lg{width:52px;height:52px;border-radius:var(--r-lg);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:18px;color:white;flex-shrink:0}
+.jdh-title{font-family:'Syne',sans-serif;font-size:22px;font-weight:700;margin-bottom:4px}
+.jdh-company{font-size:13px;color:var(--accent2);font-weight:500;margin-bottom:10px}
+.jdh-tags{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.jdh-tag{font-size:11px;padding:4px 12px;border-radius:20px;border:1px solid var(--border);font-weight:500}
+.jdh-actions{display:flex;gap:10px}
+.btn-apply{padding:10px 24px;border-radius:var(--r-md);background:var(--accent);color:white;font-size:13px;font-weight:600;cursor:pointer;border:none;font-family:'Inter',sans-serif;transition:all var(--transition);box-shadow:0 4px 12px var(--accent-glow)}
+.btn-apply:hover{transform:translateY(-1px)}
+.btn-contact{padding:10px 20px;border-radius:var(--r-md);background:var(--surface2);color:var(--text);font-size:13px;font-weight:500;cursor:pointer;border:1px solid var(--border2);font-family:'Inter',sans-serif;transition:all var(--transition)}
+.btn-contact:hover{border-color:var(--accent);color:var(--accent2)}
+.job-section{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:20px;margin-bottom:14px}
+.job-section h3{font-family:'Syne',sans-serif;font-size:16px;font-weight:700;margin-bottom:12px}
+.job-section p{font-size:13px;color:var(--text2);line-height:1.7;margin-bottom:8px}
+.job-section ul{padding-left:18px}
+.job-section li{font-size:13px;color:var(--text2);line-height:1.7;margin-bottom:4px}
+.poster-card{display:flex;gap:12px;align-items:center;background:var(--surface2);border-radius:var(--r-md);padding:14px;border:1px solid var(--border)}
+.poster-info .pname{font-weight:600;font-size:13px;margin-bottom:2px}
+.poster-info .prole{font-size:11px;color:var(--text3)}
+.poster-info .palumni{font-size:11px;color:var(--accent2);font-weight:500;margin-top:2px}
+
+/* ── COMPANY DASHBOARD ── */
+.company-dash{padding:36px 48px;flex:1;overflow-y:auto}
+.cdash-header{
+  background:linear-gradient(135deg,var(--accent),#8b45ff);
+  border-radius:var(--r-xl);padding:28px;margin-bottom:24px;
+  display:flex;align-items:center;gap:20px;position:relative;overflow:hidden;
+}
+.cdash-header::before{content:'';position:absolute;right:-40px;top:-40px;width:180px;height:180px;border-radius:50%;background:rgba(255,255,255,.05)}
+.cdash-logo{width:56px;height:56px;border-radius:var(--r-lg);background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:20px;color:white;flex-shrink:0;border:2px solid rgba(255,255,255,.2)}
+.cdash-name{font-family:'Syne',sans-serif;font-size:22px;font-weight:700;color:white;margin-bottom:2px}
+.cdash-sub{font-size:12px;color:rgba(255,255,255,.7)}
+.cdash-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px}
+.cdash-stat{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:16px;text-align:center}
+.cdash-stat-num{font-family:'Syne',sans-serif;font-size:26px;font-weight:800;color:var(--accent2);margin-bottom:2px}
+.cdash-stat-lbl{font-size:11px;color:var(--text3)}
+.cdash-jobs-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.btn-post{padding:9px 18px;border-radius:var(--r-md);background:var(--accent);color:white;font-size:12px;font-weight:600;cursor:pointer;border:none;font-family:'Inter',sans-serif;transition:all var(--transition)}
+.btn-post:hover{transform:translateY(-1px);box-shadow:0 4px 12px var(--accent-glow)}
+.company-jobs-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px}
+.cjob-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:18px;transition:all var(--transition)}
+.cjob-card:hover{border-color:var(--border2)}
+.cjob-title{font-weight:600;font-size:14px;margin-bottom:6px}
+.cjob-meta{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.cjob-actions{display:flex;gap:8px}
+.btn-edit-job{padding:5px 12px;border-radius:var(--r-sm);font-size:11px;cursor:pointer;border:1px solid var(--border2);background:var(--surface2);color:var(--text2);font-family:'Inter',sans-serif;transition:all var(--transition)}
+.btn-edit-job:hover{border-color:var(--accent);color:var(--accent2)}
+.btn-del-job{padding:5px 12px;border-radius:var(--r-sm);font-size:11px;cursor:pointer;border:1px solid var(--red-bg);background:var(--red-bg);color:var(--red);font-family:'Inter',sans-serif;transition:all var(--transition)}
+.btn-del-job:hover{background:var(--red);color:white}
+
+/* ── CANDIDATE FILTER ── */
+.candidate-section{margin-top:28px}
+.candidate-filter-bar{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;align-items:center}
+.cand-search{padding:8px 12px 8px 34px;border-radius:var(--r-md);border:1px solid var(--border2);background:var(--surface2);color:var(--text);font-size:12px;font-family:'Inter',sans-serif;outline:none;width:220px}
+.cand-search:focus{border-color:var(--accent)}
+.cand-filter-select{padding:8px 12px;border-radius:var(--r-md);border:1px solid var(--border2);background:var(--surface2);color:var(--text);font-size:12px;font-family:'Inter',sans-serif;outline:none}
+.candidates-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
+.candidate-card{background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-lg);padding:16px;transition:all var(--transition);cursor:pointer}
+.candidate-card:hover{border-color:var(--border2);transform:translateY(-1px)}
+.cand-top{display:flex;gap:10px;align-items:center;margin-bottom:10px}
+.cand-av{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;color:white;flex-shrink:0}
+.cand-name{font-weight:600;font-size:13px;margin-bottom:2px}
+.cand-role{font-size:11px;color:var(--text3)}
+.cand-skills{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:10px}
+.cand-match-row{display:flex;justify-content:space-between;align-items:center}
+.cand-status{font-size:10px;padding:2px 8px;border-radius:20px;font-weight:600}
+.status-new{background:var(--green-bg);color:var(--green)}
+.status-review{background:var(--amber-bg);color:var(--amber)}
+.status-rejected{background:var(--red-bg);color:var(--red)}
+
+/* ── AI CHAT ── */
+.chat-layout{display:flex;flex:1;overflow:hidden;height:calc(100vh - 56px)}
+.chat-sidebar{width:240px;border-right:1px solid var(--border);background:var(--surface);display:flex;flex-direction:column;flex-shrink:0}
+.sidebar-header{padding:20px 16px;border-bottom:1px solid var(--border)}
+.sidebar-logo{display:flex;align-items:center;gap:8px;margin-bottom:4px}
+.sidebar-logo-icon{width:28px;height:28px;border-radius:var(--r-sm);background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-size:14px}
+.sidebar-title{font-family:'Syne',sans-serif;font-size:15px;font-weight:700}
+.sidebar-sub{font-size:11px;color:var(--text3)}
+.sidebar-options{padding:10px;flex:1;overflow-y:auto}
+.option-item{padding:10px 12px;border-radius:var(--r-md);cursor:pointer;transition:all var(--transition);margin-bottom:2px;border:1px solid transparent;display:flex;gap:8px;align-items:flex-start}
+.option-item:hover{background:var(--surface2)}
+.option-item.active{background:var(--surface2);border-color:var(--border2)}
+.option-icon{width:24px;height:24px;border-radius:var(--r-sm);display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;margin-top:1px}
+.option-title{font-size:12px;font-weight:600;color:var(--text);margin-bottom:1px}
+.option-sub{font-size:10px;color:var(--text3)}
+
+.chat-main{flex:1;display:flex;flex-direction:column;overflow:hidden;background:var(--bg)}
+.chat-header{padding:14px 20px;border-bottom:1px solid var(--border);background:var(--surface);display:flex;align-items:center;gap:12px}
+.chat-header-icon{width:34px;height:34px;border-radius:var(--r-md);background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-size:16px;box-shadow:0 4px 12px var(--accent-glow)}
+.ch-title{font-weight:700;font-size:13px}
+.ch-sub{font-size:11px;color:var(--text3)}
+.ch-status{display:flex;align-items:center;gap:5px;font-size:10px;color:var(--green);margin-left:auto}
+.ch-status::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse 2s infinite}
+
+.chat-messages{flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:14px}
+.msg{display:flex;gap:8px;max-width:82%;animation:fadeUp .3s ease}
+.msg.user{align-self:flex-end;flex-direction:row-reverse}
+.msg-av{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0}
+.msg-ai-av{background:linear-gradient(135deg,var(--accent),var(--accent2));color:white;font-size:12px}
+.msg-user-av{background:var(--surface3);color:var(--text2)}
+.msg-bubble{padding:11px 14px;border-radius:14px;font-size:13px;line-height:1.6}
+.msg.ai .msg-bubble{background:var(--surface);border:1px solid var(--border);border-radius:14px 14px 14px 4px}
+.msg.user .msg-bubble{background:var(--accent);color:white;border-radius:14px 14px 4px 14px}
+.msg-bubble p{margin-bottom:6px}.msg-bubble p:last-child{margin-bottom:0}
+.msg-bubble strong{font-weight:600}.msg-bubble ul{padding-left:16px;margin:4px 0}.msg-bubble li{margin-bottom:3px}
+.typing-indicator{display:flex;gap:4px;align-items:center;padding:11px 14px;background:var(--surface);border:1px solid var(--border);border-radius:14px 14px 14px 4px;width:fit-content}
+.typing-dot{width:6px;height:6px;border-radius:50%;background:var(--text3);animation:typing 1.2s infinite}
+.typing-dot:nth-child(2){animation-delay:.2s}.typing-dot:nth-child(3){animation-delay:.4s}
+
+.chat-input-area{padding:14px 20px;border-top:1px solid var(--border);background:var(--surface)}
+.quick-prompts{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.qp-btn{padding:5px 10px;border-radius:20px;font-size:11px;cursor:pointer;border:1px solid var(--border2);background:var(--surface2);color:var(--text2);transition:all var(--transition);font-family:'Inter',sans-serif}
+.qp-btn:hover{background:var(--accent);color:white;border-color:var(--accent)}
+.input-row{display:flex;gap:8px;align-items:flex-end}
+.chat-input{
+  flex:1;padding:10px 14px;border:1px solid var(--border2);border-radius:var(--r-lg);
+  font-size:13px;font-family:'Inter',sans-serif;background:var(--surface2);color:var(--text);
+  resize:none;min-height:42px;max-height:120px;outline:none;transition:border-color var(--transition);line-height:1.5;
+}
+.chat-input::placeholder{color:var(--text3)}
+.chat-input:focus{border-color:var(--accent)}
+.send-btn{width:42px;height:42px;border-radius:var(--r-md);background:var(--accent);color:white;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all var(--transition);flex-shrink:0;box-shadow:0 4px 12px var(--accent-glow)}
+.send-btn:hover{transform:scale(1.05)}
+.send-btn:disabled{opacity:.4;cursor:not-allowed;transform:none}
+.alcop-ai-brand{display:flex;align-items:center;gap:6px;font-size:10px;color:var(--text3);margin-top:8px;justify-content:center}
+.alcop-ai-brand strong{color:var(--accent2)}
+
+/* ── MESSAGES ── */
+.messages-layout{display:flex;flex:1;height:calc(100vh - 56px);overflow:hidden}
+.msg-list{width:270px;border-right:1px solid var(--border);overflow-y:auto;background:var(--surface)}
+.msg-list-header{padding:18px 16px;border-bottom:1px solid var(--border);font-family:'Syne',sans-serif;font-size:16px;font-weight:700}
+.conv-item{display:flex;gap:10px;padding:12px 14px;border-bottom:1px solid var(--border);cursor:pointer;transition:background var(--transition);align-items:flex-start}
+.conv-item:hover{background:var(--surface2)}.conv-item.active{background:var(--surface2);border-left:2px solid var(--accent)}
+.conv-av{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;color:white;flex-shrink:0}
+.conv-name{font-size:12px;font-weight:600;margin-bottom:2px}.conv-preview{font-size:11px;color:var(--text3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:150px}
+.conv-time{font-size:10px;color:var(--text3);margin-left:auto;flex-shrink:0}
+.dm-area{flex:1;display:flex;flex-direction:column}
+.dm-header{padding:14px 20px;border-bottom:1px solid var(--border);background:var(--surface);display:flex;align-items:center;gap:10px}
+.dm-ai-badge{font-size:10px;padding:2px 8px;border-radius:20px;background:var(--accent-glow);color:var(--accent2);font-weight:600;margin-left:auto}
+.dm-messages{flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:12px;background:var(--bg)}
+.dm-msg{display:flex;gap:8px;max-width:76%;animation:fadeUp .3s ease}
+.dm-msg.mine{align-self:flex-end;flex-direction:row-reverse}
+.dm-bubble{padding:9px 13px;border-radius:14px;font-size:13px;line-height:1.5}
+.dm-msg:not(.mine) .dm-bubble{background:var(--surface);border:1px solid var(--border);border-radius:14px 14px 14px 4px}
+.dm-msg.mine .dm-bubble{background:var(--accent);color:white;border-radius:14px 14px 4px 14px}
+.dm-time{font-size:10px;color:var(--text3);margin-top:3px;align-self:flex-end}
+.dm-input-area{padding:14px 20px;border-top:1px solid var(--border);background:var(--surface);display:flex;gap:8px}
+.dm-input{flex:1;padding:9px 14px;border:1px solid var(--border2);border-radius:var(--r-lg);font-size:13px;font-family:'Inter',sans-serif;background:var(--surface2);color:var(--text);outline:none}
+.dm-input::placeholder{color:var(--text3)}
+.dm-input:focus{border-color:var(--accent)}
+.empty-dm{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--text3);gap:10px;background:var(--bg)}
+
+/* ── PROFILE ── */
+.profile-page{padding:36px 48px;max-width:960px}
+.profile-header{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-xl);padding:28px;display:flex;gap:20px;align-items:flex-start;margin-bottom:20px;position:relative;overflow:hidden}
+.profile-header::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,var(--accent-glow),transparent);pointer-events:none}
+.profile-av-lg{width:72px;height:72px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:24px;font-weight:800;flex-shrink:0;color:white;border:3px solid rgba(255,255,255,.15);position:relative}
+.profile-info h2{font-family:'Syne',sans-serif;font-size:24px;font-weight:800;margin-bottom:4px}
+.profile-role-text{color:var(--text3);font-size:13px;margin-bottom:12px}
+.profile-tags{display:flex;gap:7px;flex-wrap:wrap}
+.profile-tag{font-size:11px;padding:4px 12px;border-radius:20px;border:1px solid var(--border)}
+.pt-goal{background:var(--accent-glow);color:var(--accent2);border-color:rgba(108,99,255,.3)}
+.pt-skill{background:var(--surface2);color:var(--text2)}
+.profile-cards{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.p-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:20px;transition:all var(--transition)}
+.p-card:hover{border-color:var(--border2)}
+.p-card-title{font-family:'Syne',sans-serif;font-size:14px;font-weight:700;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center}
+.edit-link{font-size:11px;color:var(--accent2);cursor:pointer;font-weight:500}
+.info-row{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--border);font-size:12px}
+.info-row:last-child{border-bottom:none}
+.info-label{color:var(--text3)}.info-val{font-weight:500;color:var(--text)}
+
+/* ── MODALS ── */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:500;display:flex;align-items:center;justify-content:center;animation:fadeIn .2s ease;backdrop-filter:blur(4px)}
+.modal-box{background:var(--surface);border:1px solid var(--border2);border-radius:var(--r-xl);padding:28px;width:100%;max-width:520px;max-height:90vh;overflow-y:auto;box-shadow:var(--shadow-lg);animation:slideUp .3s ease}
+.modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px}
+.modal-title{font-family:'Syne',sans-serif;font-size:20px;font-weight:700}
+.modal-close{width:30px;height:30px;border-radius:50%;border:1px solid var(--border);background:var(--surface2);color:var(--text3);cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;transition:all var(--transition)}
+.modal-close:hover{background:var(--surface3);color:var(--text)}
+.modal-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.modal-group{display:flex;flex-direction:column;gap:5px}
+.modal-group.full{grid-column:1/-1}
+.modal-label{font-size:11px;color:var(--text3);font-weight:600;letter-spacing:.3px;text-transform:uppercase}
+.modal-input{padding:9px 12px;border:1px solid var(--border2);border-radius:var(--r-md);font-size:13px;font-family:'Inter',sans-serif;background:var(--surface2);color:var(--text);outline:none;transition:border-color var(--transition)}
+.modal-input::placeholder{color:var(--text3)}
+.modal-input:focus{border-color:var(--accent)}
+.modal-footer{display:flex;gap:10px;justify-content:flex-end;margin-top:20px;padding-top:16px;border-top:1px solid var(--border)}
+.modal-btn-cancel{padding:9px 20px;border-radius:var(--r-md);border:1px solid var(--border);background:transparent;color:var(--text3);font-size:12px;cursor:pointer;font-family:'Inter',sans-serif;transition:all var(--transition)}
+.modal-btn-cancel:hover{border-color:var(--border2);color:var(--text)}
+.modal-btn-save{padding:9px 20px;border-radius:var(--r-md);background:var(--accent);color:white;font-size:12px;font-weight:600;cursor:pointer;border:none;font-family:'Inter',sans-serif;transition:all var(--transition)}
+.modal-btn-save:hover{box-shadow:0 4px 12px var(--accent-glow)}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:24px;right:24px;background:var(--surface);border:1px solid var(--border2);color:var(--text);padding:12px 18px;border-radius:var(--r-lg);font-size:12px;z-index:999;animation:slideUp .3s ease;box-shadow:var(--shadow);display:flex;align-items:center;gap:8px}
+.toast::before{content:'✓';width:18px;height:18px;border-radius:50%;background:var(--green);color:white;font-size:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+
+/* ── FOOTER ── */
+footer{background:var(--surface);border-top:1px solid var(--border);color:var(--text3);text-align:center;padding:18px 32px;font-size:11px;margin-top:auto}
+footer strong{color:var(--text2)}
+footer a{color:var(--accent2);text-decoration:none}
+
+/* ── APPLY MODAL ── */
+.apply-success{text-align:center;padding:20px 0}
+.apply-success .check{font-size:44px;margin-bottom:14px}
+.apply-success h3{font-family:'Syne',sans-serif;font-size:20px;font-weight:700;margin-bottom:8px}
+.apply-success p{color:var(--text3);font-size:13px}
+
+/* ── MISC ── */
+.badge-flag{font-size:11px;margin-right:4px}
+</style>
+</head>
+<body>
+
+<!-- ═══════════ PORTAL ═══════════ -->
+<div id="portalScreen">
+  <div class="portal-bg">
+    <div class="portal-orb portal-orb-1"></div>
+    <div class="portal-orb portal-orb-2"></div>
+    <div class="portal-orb portal-orb-3"></div>
+  </div>
+  <div class="portal-wrap">
+    <!-- LEFT PANEL -->
+    <div class="portal-left">
+      <div class="portal-brand">
+        <div class="portal-logo">AL<span class="accent">COP</span></div>
+        <div class="portal-fullname" data-i18n="portal_fullname">Alumni Connect Platform</div>
+      </div>
+      <div class="portal-hero">
+        <div class="portal-hero-title" data-i18n-html="portal_hero_title">Kariyerine <span style="background:linear-gradient(135deg,#6c63ff,#8b85ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">yön ver</span>,<br>mezunlarla bağlan.</div>
+        <div class="portal-hero-sub" data-i18n="portal_hero_sub">AI destekli eşleştirme ile sana en uygun mentorları, iş ilanlarını ve kariyer rehberliğini sunuyoruz.</div>
+        <div class="portal-stats">
+          <div class="pstat"><div class="pstat-num">2,400+</div><div class="pstat-lbl" data-i18n="stat_alumni">Aktif Mezun</div></div>
+          <div class="pstat"><div class="pstat-num">180+</div><div class="pstat-lbl" data-i18n="stat_companies">Şirket</div></div>
+          <div class="pstat"><div class="pstat-num">94%</div><div class="pstat-lbl" data-i18n="stat_match">Eşleşme Başarısı</div></div>
+        </div>
+      </div>
+      <div class="portal-badges">
+        <div class="pbadge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg><span data-i18n="badge_ai">AI Destekli</span></div>
+        <div class="pbadge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 010 20"/></svg><span data-i18n="badge_global">Global Ağ</span></div>
+        <div class="pbadge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg><span data-i18n="badge_mentor">Mentorluk</span></div>
+        <div class="pbadge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg><span data-i18n="badge_rnu">RNU Platformu</span></div>
+      </div>
+    </div>
+
+    <!-- RIGHT PANEL -->
+    <div class="portal-right">
+      <div class="portal-type-toggle">
+        <button class="ptype-btn active" id="ptype-student" onclick="setPortalType('student')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          <span data-i18n="ptype_student">Öğrenci / Mezun</span>
+        </button>
+        <button class="ptype-btn" id="ptype-company" onclick="setPortalType('company')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v16"/></svg>
+          <span data-i18n="ptype_company">Şirket</span>
+        </button>
+      </div>
+
+      <div class="portal-tab-row">
+        <button class="ptab active" id="ptab-login" onclick="setPortalTab('login')" data-i18n="ptab_login">Giriş Yap</button>
+        <button class="ptab" id="ptab-register" onclick="setPortalTab('register')" data-i18n="ptab_register">Kayıt Ol</button>
+      </div>
+
+      <!-- LOGIN -->
+      <div id="pform-login">
+        <div class="pform-title" data-i18n="login_title">Tekrar hoş geldin</div>
+        <div class="pform-sub" data-i18n="login_sub">Hesabına giriş yap ve keşfetmeye devam et</div>
+        <div class="pform-group">
+          <label class="pform-label" data-i18n="label_email">E-posta</label>
+          <div class="pform-input-wrap">
+            <svg class="pform-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            <input class="pform-input" type="email" id="login-email" data-i18n-placeholder="ph_email" placeholder="ornek@universite.edu.tr">
+          </div>
+        </div>
+        <div class="pform-group">
+          <label class="pform-label" data-i18n="label_password">Şifre</label>
+          <div class="pform-input-wrap">
+            <svg class="pform-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+            <input class="pform-input" type="password" id="login-pass" placeholder="••••••••">
+          </div>
+        </div>
+        <div class="portal-err" id="login-err"></div>
+        <button class="portal-submit" onclick="doLogin()" data-i18n="btn_login">Giriş Yap</button>
+        <div class="portal-divider" data-i18n="or_demo">veya demo ile dene</div>
+        <div class="portal-demo">
+          <button class="demo-btn" onclick="demoLogin('student')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            <span data-i18n="demo_student">Öğrenci Demo</span>
+          </button>
+          <button class="demo-btn" onclick="demoLogin('company')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v16"/></svg>
+            <span data-i18n="demo_company">Şirket Demo</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- REGISTER -->
+      <div id="pform-register" style="display:none">
+        <div class="pform-title" data-i18n="register_title">Hesap oluştur</div>
+        <div class="pform-sub" data-i18n="register_sub">ALCOP topluluğuna katıl</div>
+
+        <div id="reg-student-fields" style="display:flex;flex-direction:column">
+          <div class="pform-group">
+            <label class="pform-label" data-i18n="label_fullname">Ad Soyad</label>
+            <div class="pform-input-wrap">
+              <svg class="pform-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              <input class="pform-input" type="text" id="reg-name" data-i18n-placeholder="ph_fullname" placeholder="Ahmet Yılmaz">
+            </div>
+          </div>
+          <div class="pform-group">
+            <label class="pform-label" data-i18n="label_email">E-posta</label>
+            <div class="pform-input-wrap">
+              <svg class="pform-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+              <input class="pform-input" type="email" id="reg-email" data-i18n-placeholder="ph_email" placeholder="ahmet@uni.edu.tr">
+            </div>
+          </div>
+          <div class="pform-group">
+            <label class="pform-label" data-i18n="label_dept">Bölüm</label>
+            <div class="pform-input-wrap">
+              <svg class="pform-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+              <input class="pform-input" type="text" id="reg-dept" data-i18n-placeholder="ph_dept" placeholder="Bilgisayar Mühendisliği">
+            </div>
+          </div>
+          <div class="pform-group">
+            <label class="pform-label" data-i18n="label_type">Tür</label>
+            <select class="pform-select" id="reg-utype">
+              <option value="student" data-i18n="opt_student">Öğrenci</option>
+              <option value="alumni" data-i18n="opt_alumni">Mezun</option>
+            </select>
+          </div>
+          <div class="pform-group">
+            <label class="pform-label" data-i18n="label_password">Şifre</label>
+            <div class="pform-input-wrap">
+              <svg class="pform-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+              <input class="pform-input" type="password" id="reg-pass" placeholder="••••••••">
+            </div>
+          </div>
+          <div class="portal-err" id="reg-err"></div>
+          <button class="portal-submit" onclick="doRegister()" data-i18n="btn_register">Kayıt Ol</button>
+        </div>
+
+        <div id="reg-company-fields" style="display:none;flex-direction:column">
+          <div class="pform-group">
+            <label class="pform-label" data-i18n="label_company_name">Şirket Adı</label>
+            <div class="pform-input-wrap">
+              <svg class="pform-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v16"/></svg>
+              <input class="pform-input" type="text" id="reg-cname" placeholder="Trendyol">
+            </div>
+          </div>
+          <div class="pform-group">
+            <label class="pform-label" data-i18n="label_sector">Sektör</label>
+            <div class="pform-input-wrap">
+              <svg class="pform-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+              <input class="pform-input" type="text" id="reg-csector" data-i18n-placeholder="ph_sector" placeholder="E-ticaret / Teknoloji">
+            </div>
+          </div>
+          <div class="pform-group">
+            <label class="pform-label" data-i18n="label_email">E-posta</label>
+            <div class="pform-input-wrap">
+              <svg class="pform-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+              <input class="pform-input" type="email" id="reg-cemail" placeholder="hr@sirket.com">
+            </div>
+          </div>
+          <div class="pform-group">
+            <label class="pform-label" data-i18n="label_password">Şifre</label>
+            <div class="pform-input-wrap">
+              <svg class="pform-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+              <input class="pform-input" type="password" id="reg-cpass" placeholder="••••••••">
+            </div>
+          </div>
+          <div class="portal-err" id="reg-cerr"></div>
+          <button class="portal-submit" onclick="doCompanyRegister()" data-i18n="btn_register">Kayıt Ol</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ MAIN APP ═══════════ -->
+<div class="app" id="mainApp" style="display:none">
+  <nav>
+    <div class="nav-logo" onclick="showPage('home')">
+      <div class="dot"></div>
+      AL<span class="accent">COP</span>
+    </div>
+    <div class="nav-tabs" id="navTabs">
+      <button class="nav-tab active" onclick="showPage('home')" data-i18n="nav_explore">Keşfet</button>
+      <button class="nav-tab" onclick="showPage('jobs')" data-i18n="nav_jobs">İlanlar</button>
+      <button class="nav-tab" onclick="showPage('ai')" data-i18n="nav_ai">ALCOP AI</button>
+      <button class="nav-tab" onclick="showPage('messages')" data-i18n="nav_messages">Mesajlar</button>
+      <button class="nav-tab" onclick="showPage('profile')" data-i18n="nav_profile">Profil</button>
+    </div>
+    <div class="nav-right">
+      <div class="lang-toggle">
+        <button class="lang-btn active" id="btn-tr" onclick="setLang('tr')">TR</button>
+        <button class="lang-btn" id="btn-en" onclick="setLang('en')">EN</button>
+      </div>
+      <div class="user-pill" onclick="showPage('profile')">
+        <div class="nav-av" id="navAvatar">AY</div>
+        <span id="navUserName">Ahmet Yılmaz</span>
+        <span class="company-badge" id="navBadge" style="display:none">CO</span>
+      </div>
+    </div>
+  </nav>
+
+  <!-- HOME -->
+  <div id="page-home" class="page active">
+    <div class="home-hero">
+      <div class="hero-grid-bg"></div>
+      <div class="hero-orb hero-orb-1"></div>
+      <div class="hero-orb hero-orb-2"></div>
+      <div class="hero-inner">
+        <div class="hero-badge" data-i18n="hero_badge">AI Destekli Kariyer Platformu</div>
+        <h1 class="hero-title" data-i18n-html="hero_title">Kariyerine <em>yön ver</em>,<br>mezunlarla bağlan.</h1>
+        <p class="hero-sub" data-i18n="hero_sub">AI destekli eşleştirme ile sana en uygun mentorları buluyoruz. Gerçek kariyer tavsiyeleri, gerçek bağlantılar.</p>
+        <div class="hero-btns">
+          <button class="btn-primary" onclick="showPage('ai')" data-i18n="hero_btn1">ALCOP AI ile Planla</button>
+          <button class="btn-secondary" onclick="showPage('jobs')" data-i18n="hero_btn2">İlanları Gör</button>
+        </div>
+      </div>
+    </div>
+    <div class="home-content">
+      <div class="stats-row">
+        <div class="stat-card"><div class="stat-num">2,400+</div><div class="stat-lbl" data-i18n="stat1">Aktif Mezun</div></div>
+        <div class="stat-card"><div class="stat-num">94%</div><div class="stat-lbl" data-i18n="stat2">Eşleştirme Başarısı</div></div>
+        <div class="stat-card"><div class="stat-num">180+</div><div class="stat-lbl" data-i18n="stat3">Şirket Ortağı</div></div>
+        <div class="stat-card"><div class="stat-num">42</div><div class="stat-lbl" data-i18n="stat4">Ülke</div></div>
+      </div>
+      <div class="section-row">
+        <h2 class="section-title" id="alumni-list" data-i18n="suggested_alumni">Sana Önerilen Mezunlar</h2>
+      </div>
+      <div class="alumni-grid" id="alumniGrid"></div>
+    </div>
+  </div>
+
+  <!-- JOBS -->
+  <div id="page-jobs" class="page">
+    <div class="jobs-layout" id="jobsStudentView">
+      <div class="jobs-sidebar">
+        <div class="jobs-sidebar-header">
+          <div class="search-wrap">
+            <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input class="jobs-search" id="jobSearchInput" data-i18n-placeholder="ph_job_search" placeholder="İlan ara..." oninput="filterJobs()">
+          </div>
+          <div class="jobs-filter-row" id="jobFilters">
+            <button class="filter-chip active" onclick="setFilter('all',this)" data-i18n="filter_all">Tümü</button>
+            <button class="filter-chip" onclick="setFilter('Full-time',this)" data-i18n="filter_fulltime">Tam Zamanlı</button>
+            <button class="filter-chip" onclick="setFilter('Internship',this)" data-i18n="filter_intern">Staj</button>
+            <button class="filter-chip" onclick="setFilter('Remote',this)" data-i18n="filter_remote">Uzaktan</button>
+          </div>
+        </div>
+        <div id="jobListItems"></div>
+      </div>
+      <div id="jobDetail" class="job-detail">
+        <div class="job-detail-empty">
+          <div class="jde-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v16"/></svg>
+          </div>
+          <div style="font-size:13px" data-i18n="job_select_prompt">Bir ilan seçin</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- COMPANY DASH -->
+    <div class="company-dash" id="jobsCompanyView" style="display:none">
+      <div class="cdash-header">
+        <div class="cdash-logo" id="cdashLogo">T</div>
+        <div>
+          <div class="cdash-name" id="cdashName">Trendyol</div>
+          <div class="cdash-sub" id="cdashSub">E-ticaret / Teknoloji</div>
+        </div>
+        <button class="btn-post" style="margin-left:auto" onclick="openPostJobModal()" data-i18n="btn_post_job">+ Yeni İlan</button>
+      </div>
+      <div class="cdash-stats">
+        <div class="cdash-stat"><div class="cdash-stat-num" id="cds-active">0</div><div class="cdash-stat-lbl" data-i18n="cds_active">Aktif İlan</div></div>
+        <div class="cdash-stat"><div class="cdash-stat-num">24</div><div class="cdash-stat-lbl" data-i18n="cds_apps">Başvuru</div></div>
+        <div class="cdash-stat"><div class="cdash-stat-num">8</div><div class="cdash-stat-lbl" data-i18n="cds_msgs">Mesaj</div></div>
+        <div class="cdash-stat"><div class="cdash-stat-num">5</div><div class="cdash-stat-lbl" data-i18n="cds_alumni">Alumni</div></div>
+      </div>
+      <h2 class="section-title" data-i18n="my_postings">İlanlarım</h2>
+      <div class="company-jobs-grid" id="companyJobsGrid"></div>
+
+      <!-- CANDIDATE FILTER -->
+      <div class="candidate-section">
+        <div class="section-row" style="margin-bottom:14px">
+          <h2 class="section-title" style="margin:0" data-i18n="candidate_title">Aday Havuzu</h2>
+        </div>
+        <div class="candidate-filter-bar">
+          <div style="position:relative">
+            <svg style="position:absolute;left:10px;top:50%;transform:translateY(-50%);width:13px;height:13px;color:var(--text3)" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input class="cand-search" id="candSearch" style="padding-left:32px" data-i18n-placeholder="ph_cand_search" placeholder="Aday ara..." oninput="filterCandidates()">
+          </div>
+          <select class="cand-filter-select" id="candSkillFilter" onchange="filterCandidates()">
+            <option value="" data-i18n="filter_all_skills">Tüm Beceriler</option>
+            <option>Python</option><option>React</option><option>ML</option>
+            <option>Product</option><option>UX</option><option>DevOps</option>
+          </select>
+          <select class="cand-filter-select" id="candStatusFilter" onchange="filterCandidates()">
+            <option value="" data-i18n="filter_all_status">Tüm Durumlar</option>
+            <option value="new" data-i18n="status_new_opt">Yeni</option>
+            <option value="review" data-i18n="status_review_opt">İncelemede</option>
+          </select>
+          <select class="cand-filter-select" id="candMatchFilter" onchange="filterCandidates()">
+            <option value="" data-i18n="filter_all_match">Tüm Eşleşmeler</option>
+            <option value="90" data-i18n="filter_match_90">%90+</option>
+            <option value="80" data-i18n="filter_match_80">%80+</option>
+            <option value="70" data-i18n="filter_match_70">%70+</option>
+          </select>
+        </div>
+        <div class="candidates-grid" id="candidatesGrid"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- AI -->
+  <div id="page-ai" class="page">
+    <div class="chat-layout">
+      <div class="chat-sidebar">
+        <div class="sidebar-header">
+          <div class="sidebar-logo">
+            <div class="sidebar-logo-icon">✦</div>
+            <div class="sidebar-title">ALCOP AI</div>
+          </div>
+          <div class="sidebar-sub" data-i18n="ai_sidebar_sub">Gemini ile güçlendirilmiş</div>
+        </div>
+        <div class="sidebar-options">
+          <div class="option-item active" onclick="setMode('mentor',this)">
+            <div class="option-icon" style="background:var(--accent-glow)">🎯</div>
+            <div><div class="option-title" data-i18n="mode_mentor_title">Mentor Eşleştirme</div><div class="option-sub" data-i18n="mode_mentor_sub">En uygun mezunu bul</div></div>
+          </div>
+          <div class="option-item" onclick="setMode('roadmap',this)">
+            <div class="option-icon" style="background:var(--blue-bg)">🗺️</div>
+            <div><div class="option-title" data-i18n="mode_roadmap_title">Kariyer Yol Haritası</div><div class="option-sub" data-i18n="mode_roadmap_sub">Hedefine adım adım</div></div>
+          </div>
+          <div class="option-item" onclick="setMode('cv',this)">
+            <div class="option-icon" style="background:var(--green-bg)">📄</div>
+            <div><div class="option-title" data-i18n="mode_cv_title">CV Analizi</div><div class="option-sub" data-i18n="mode_cv_sub">CV'ni güçlendir</div></div>
+          </div>
+          <div class="option-item" onclick="setMode('salary',this)">
+            <div class="option-icon" style="background:var(--amber-bg)">💰</div>
+            <div><div class="option-title" data-i18n="mode_salary_title">Maaş Rehberi</div><div class="option-sub" data-i18n="mode_salary_sub">Sektör maaşlarını öğren</div></div>
+          </div>
+          <div class="option-item" onclick="setMode('interview',this)">
+            <div class="option-icon" style="background:var(--pink-bg)">🎤</div>
+            <div><div class="option-title" data-i18n="mode_interview_title">Mülakat Hazırlığı</div><div class="option-sub" data-i18n="mode_interview_sub">Sorular ve teknikler</div></div>
+          </div>
+          <div class="option-item" onclick="setMode('sector',this)">
+            <div class="option-icon" style="background:var(--red-bg)">📊</div>
+            <div><div class="option-title" data-i18n="mode_sector_title">Sektör Analizi</div><div class="option-sub" data-i18n="mode_sector_sub">Trend ve fırsatlar</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="chat-main">
+        <div class="chat-header">
+          <div class="chat-header-icon">✦</div>
+          <div class="chat-header-text">
+            <div class="ch-title" id="chatTitle">Mentor Eşleştirme</div>
+            <div class="ch-sub" data-i18n="chat_header_sub">ALCOP AI — Gemini Destekli</div>
+          </div>
+          <div class="ch-status" data-i18n="ai_online">Çevrimiçi</div>
+        </div>
+        <div class="chat-messages" id="chatMessages">
+          <div class="msg ai">
+            <div class="msg-av msg-ai-av">✦</div>
+            <div class="msg-bubble">
+              <p data-i18n="greeting">Merhaba! 👋 Ben ALCOP AI, kariyer asistanınım.</p>
+              <p data-i18n="greeting2">Mentor eşleştirme, kariyer yol haritası, CV analizi ve daha fazlası için buradayım.</p>
+              <p data-i18n="greeting3">Nasıl yardımcı olabilirim?</p>
+            </div>
+          </div>
+        </div>
+        <div class="chat-input-area">
+          <div class="quick-prompts">
+            <button class="qp-btn" onclick="sendQuick(t('qp1_msg'))" data-i18n="qp1">Yazılım kariyeri planla</button>
+            <button class="qp-btn" onclick="sendQuick(t('qp2_msg'))" data-i18n="qp2">Mentor öner</button>
+            <button class="qp-btn" onclick="sendQuick(t('qp3_msg'))" data-i18n="qp3">CV güçlendir</button>
+            <button class="qp-btn" onclick="sendQuick(t('qp4_msg'))" data-i18n="qp4">Sektör trendleri</button>
+          </div>
+          <div class="input-row">
+            <textarea class="chat-input" id="chatInput" data-i18n-placeholder="chat_placeholder" placeholder="Sorunuzu yazın..." rows="1" onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
+            <button class="send-btn" id="sendBtn" onclick="sendMessage()">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+            </button>
+          </div>
+          <div class="alcop-ai-brand">Powered by <strong>ALCOP AI</strong> · Gemini 2.0 Flash</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MESSAGES -->
+  <div id="page-messages" class="page">
+    <div class="messages-layout">
+      <div class="msg-list">
+        <div class="msg-list-header" data-i18n="messages_title">Mesajlar</div>
+        <div id="convList"></div>
+      </div>
+      <div class="dm-area" id="dmArea">
+        <div class="empty-dm">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" opacity=".3"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+          <div style="font-size:13px" data-i18n="select_conv">Bir konuşma seçin</div>
+          <div style="font-size:11px;color:var(--text3)" data-i18n="gemini_powered">Gemini AI ile destekleniyor</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PROFILE -->
+  <div id="page-profile" class="page">
+    <div class="profile-page" id="profileContent"></div>
+  </div>
+
+  <footer>
+    <strong>ALCOP</strong> — Alumni Connect Platform &nbsp;·&nbsp; Bir <a href="#">chabatu</a> projesidir &nbsp;·&nbsp; RNU için hazırlanmıştır &nbsp;·&nbsp; ©2026–2026
+  </footer>
+</div>
+
+<!-- EDIT PROFILE MODAL -->
+<div class="modal-overlay" id="editProfileModal" style="display:none">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div class="modal-title" data-i18n="modal_edit_title">Profili Düzenle</div>
+      <button class="modal-close" onclick="closeModal('editProfileModal')">✕</button>
+    </div>
+    <div class="modal-grid" id="editProfileFields"></div>
+    <div class="modal-footer">
+      <button class="modal-btn-cancel" onclick="closeModal('editProfileModal')" data-i18n="btn_cancel">İptal</button>
+      <button class="modal-btn-save" onclick="saveProfile()" data-i18n="btn_save">Kaydet</button>
+    </div>
+  </div>
+</div>
+
+<!-- POST JOB MODAL -->
+<div class="modal-overlay" id="postJobModal" style="display:none">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div class="modal-title" data-i18n="modal_post_job">Yeni İlan Oluştur</div>
+      <button class="modal-close" onclick="closeModal('postJobModal')">✕</button>
+    </div>
+    <div class="modal-grid">
+      <div class="modal-group full"><label class="modal-label" data-i18n="label_job_title">Pozisyon Başlığı</label><input class="modal-input" id="pj-title" placeholder="Senior Frontend Developer"></div>
+      <div class="modal-group"><label class="modal-label" data-i18n="label_job_type">İlan Türü</label>
+        <select class="modal-input" id="pj-type">
+          <option value="Full-time" data-i18n="opt_fulltime">Tam Zamanlı</option>
+          <option value="Internship" data-i18n="opt_intern">Staj</option>
+          <option value="Remote" data-i18n="opt_remote">Uzaktan</option>
+        </select>
+      </div>
+      <div class="modal-group"><label class="modal-label" data-i18n="label_dept">Departman</label><input class="modal-input" id="pj-dept" data-i18n-placeholder="ph_dept_eng" placeholder="Mühendislik"></div>
+      <div class="modal-group"><label class="modal-label" data-i18n="label_salary">Maaş Aralığı</label><input class="modal-input" id="pj-salary" placeholder="40.000 - 60.000 TL"></div>
+      <div class="modal-group"><label class="modal-label" data-i18n="label_location">Lokasyon</label><input class="modal-input" id="pj-location" placeholder="İstanbul / Remote"></div>
+      <div class="modal-group full"><label class="modal-label" data-i18n="label_description">Açıklama</label><textarea class="modal-input" id="pj-desc" rows="3" placeholder="Pozisyon hakkında açıklama..."></textarea></div>
+      <div class="modal-group full"><label class="modal-label" data-i18n="label_requirements">Gereksinimler</label><input class="modal-input" id="pj-reqs" placeholder="React, TypeScript, 3+ yıl"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="modal-btn-cancel" onclick="closeModal('postJobModal')" data-i18n="btn_cancel">İptal</button>
+      <button class="modal-btn-save" onclick="postJob()" data-i18n="btn_post_job">İlanı Yayınla</button>
+    </div>
+  </div>
+</div>
+
+<!-- APPLY MODAL -->
+<div class="modal-overlay" id="applyModal" style="display:none">
+  <div class="modal-box" style="max-width:420px">
+    <div id="applyFormView">
+      <div class="modal-header">
+        <div class="modal-title" data-i18n="modal_apply">Başvur</div>
+        <button class="modal-close" onclick="closeModal('applyModal')">✕</button>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div class="modal-group"><label class="modal-label" data-i18n="label_cover">Ön Yazı</label><textarea class="modal-input" id="apply-cover" rows="4" data-i18n-placeholder="ph_cover" placeholder="Neden bu pozisyon için uygunsunuz?"></textarea></div>
+        <div class="modal-group"><label class="modal-label" data-i18n="label_cv_link">CV Linki</label><input class="modal-input" id="apply-cv" placeholder="https://linkedin.com/in/..."></div>
+      </div>
+      <div class="modal-footer">
+        <button class="modal-btn-cancel" onclick="closeModal('applyModal')" data-i18n="btn_cancel">İptal</button>
+        <button class="modal-btn-save" onclick="submitApply()" data-i18n="btn_apply">Başvuruyu Gönder</button>
+      </div>
+    </div>
+    <div id="applySuccessView" style="display:none" class="apply-success">
+      <div class="check">✅</div>
+      <h3 data-i18n="apply_success_title">Başvurunuz Alındı!</h3>
+      <p data-i18n="apply_success_sub">Şirket en kısa sürede sizinle iletişime geçecek.</p>
+      <button class="modal-btn-save" style="margin-top:16px;width:100%" onclick="closeModal('applyModal');resetApplyModal()" data-i18n="btn_close">Kapat</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ════════════════════════════════════════════════
+//  CONFIG
+// ════════════════════════════════════════════════
+const GEMINI_KEY = 'AIzaSyBQmGucNZU189reZW01a_NhuwAyXIYqhKU';
+const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_KEY}`;
+
+// ════════════════════════════════════════════════
+//  STATE
+// ════════════════════════════════════════════════
+let currentUser = null;
+let currentLang = 'tr';
+let currentMode = 'mentor';
+let chatHistory = [];
+let isLoading = false;
+let activeConv = null;
+let activeJobId = null;
+let jobFilter = 'all';
+let companyJobs = [];
+
+// ════════════════════════════════════════════════
+//  DATA — ALUMNI (expanded, international)
+// ════════════════════════════════════════════════
+const alumni = [
+  { name:"Selin Kaya", initials:"SK", color:"#6c63ff", role:"Senior Product Manager", company:"Getir", country:"🇹🇷", dept:"Bil. Müh. 2018", tags:["Product","Agile","Fintech"], match:94 },
+  { name:"Mert Özdemir", initials:"MÖ", color:"#c44d3a", role:"Software Engineer", company:"Trendyol", country:"🇹🇷", dept:"Bil. Müh. 2019", tags:["React","Node.js","AWS"], match:88 },
+  { name:"Ayşe Türk", initials:"AT", color:"#534AB7", role:"Data Scientist", company:"Yapı Kredi", country:"🇹🇷", dept:"End. Müh. 2017", tags:["ML","Python","Fintech"], match:81 },
+  { name:"Burak Şahin", initials:"BŞ", color:"#d97706", role:"UX Lead", company:"Peak Games", country:"🇹🇷", dept:"Tasarım 2020", tags:["UX","Figma","Gaming"], match:75 },
+  { name:"Zeynep Arslan", initials:"ZA", color:"#0ea5e9", role:"Startup Founder", company:"NovaTech", country:"🇹🇷", dept:"Yönetim 2016", tags:["Startup","B2B","SaaS"], match:79 },
+  { name:"Emre Çelik", initials:"EÇ", color:"#22c55e", role:"DevOps Engineer", company:"PayTR", country:"🇹🇷", dept:"Bil. Müh. 2021", tags:["Docker","K8s","CI/CD"], match:70 },
+  { name:"Lena Fischer", initials:"LF", color:"#ec4899", role:"ML Engineer", company:"Zalando", country:"🇩🇪", dept:"Computer Sci. 2019", tags:["PyTorch","MLOps","NLP"], match:86 },
+  { name:"James Carter", initials:"JC", color:"#8b5cf6", role:"Product Director", company:"Spotify", country:"🇸🇪", dept:"Business 2015", tags:["Strategy","B2C","Growth"], match:78 },
+  { name:"Amira Hassan", initials:"AH", color:"#06b6d4", role:"Frontend Engineer", company:"Delivery Hero", country:"🇪🇬", dept:"Software Eng. 2020", tags:["Vue.js","TypeScript","PWA"], match:83 },
+  { name:"Yuki Tanaka", initials:"YT", color:"#f43f5e", role:"Data Engineer", company:"Mercari", country:"🇯🇵", dept:"Informatics 2018", tags:["Spark","Kafka","GCP"], match:72 },
+  { name:"Carlos Mendez", initials:"CM", color:"#10b981", role:"Cloud Architect", company:"Stripe", country:"🇲🇽", dept:"Comp. Eng. 2016", tags:["AWS","Terraform","Security"], match:80 },
+  { name:"Sophie Dubois", initials:"SD", color:"#f59e0b", role:"UX Researcher", company:"BlaBlaCar", country:"🇫🇷", dept:"Design 2019", tags:["Research","Figma","Mobile"], match:74 },
+  { name:"Kerim Aydın", initials:"KA", color:"#3b82f6", role:"Backend Engineer", company:"Hepsiburada", country:"🇹🇷", dept:"Bil. Müh. 2020", tags:["Java","Spring","Kafka"], match:85 },
+  { name:"Priya Sharma", initials:"PS", color:"#a855f7", role:"Product Manager", company:"Wise", country:"🇮🇳", dept:"MBA 2017", tags:["Fintech","Analytics","Agile"], match:89 },
+  { name:"Erik Johansson", initials:"EJ", color:"#14b8a6", role:"Cybersecurity Lead", company:"Klarna", country:"🇸🇪", dept:"InfoSec 2015", tags:["Pentesting","SIEM","Zero Trust"], match:67 },
+  { name:"Nadia Al-Rashid", initials:"NA", color:"#f97316", role:"AI Researcher", company:"Cohere", country:"🇦🇪", dept:"Math & CS 2020", tags:["LLMs","Research","Python"], match:91 },
+  { name:"Marco Romano", initials:"MR", color:"#6366f1", role:"Growth Lead", company:"Satispay", country:"🇮🇹", dept:"Marketing 2018", tags:["Growth","SEO","Analytics"], match:71 },
+  { name:"Elif Demir", initials:"ED", color:"#ef4444", role:"Mobile Developer", company:"Turkcell", country:"🇹🇷", dept:"Bil. Müh. 2021", tags:["Flutter","iOS","Android"], match:82 },
+];
+
+// ════════════════════════════════════════════════
+//  DATA — JOBS (expanded, international)
+// ════════════════════════════════════════════════
+const jobs = [
+  { id:1, title:"Senior Frontend Developer", company:"Trendyol", companyColor:"#c44d3a", companyInitials:"T", type:"Full-time", location:"İstanbul", salary:"50K–80K TL", dept:"Engineering", isNew:true, poster:{name:"Mert Özdemir",initials:"MÖ",color:"#c44d3a",role:"Software Engineer"}, desc:"Trendyol'un büyüyen frontend ekibine katılacak deneyimli bir geliştirici arıyoruz.", reqs:["React 18+","TypeScript","3+ yıl deneyim","Jest/RTL"] },
+  { id:2, title:"Product Manager – Payments", company:"Getir", companyColor:"#6c63ff", companyInitials:"G", type:"Full-time", location:"İstanbul / Remote", salary:"60K–90K TL", dept:"Product", isNew:true, poster:{name:"Selin Kaya",initials:"SK",color:"#6c63ff",role:"Senior PM"}, desc:"Ödeme ürünleri ekibimize liderlik edecek stratejik bir PM arıyoruz.", reqs:["PM 3+ yıl","Fintech bilgisi","Agile/Scrum","Data-driven"] },
+  { id:3, title:"Software Engineer Intern", company:"NovaTech", companyColor:"#0ea5e9", companyInitials:"N", type:"Internship", location:"İstanbul", salary:"15K–20K TL", dept:"Engineering", isNew:false, poster:{name:"Zeynep Arslan",initials:"ZA",color:"#0ea5e9",role:"Founder"}, desc:"Startup ortamında hızlı büyümek isteyen junior geliştiriciler için mükemmel fırsat.", reqs:["Python veya JS","3-4. sınıf","GitHub profili","Girişimci ruh"] },
+  { id:4, title:"Data Analyst", company:"Yapı Kredi", companyColor:"#534AB7", companyInitials:"YK", type:"Full-time", location:"İstanbul", salary:"35K–55K TL", dept:"Analytics", isNew:false, poster:{name:"Ayşe Türk",initials:"AT",color:"#534AB7",role:"Data Scientist"}, desc:"Fintech veri ekibimizde ürün ve iş kararlarını destekleyecek analist arıyoruz.", reqs:["SQL (ileri)","Python / R","Tableau","İstatistik"] },
+  { id:5, title:"UX Designer – Mobile", company:"Peak Games", companyColor:"#d97706", companyInitials:"PG", type:"Remote", location:"Remote", salary:"40K–60K TL", dept:"Design", isNew:false, poster:{name:"Burak Şahin",initials:"BŞ",color:"#d97706",role:"UX Lead"}, desc:"Mobil oyun deneyimleri tasarlayacak güçlü bir UX Designer.", reqs:["Figma uzmanı","User Research","Gaming tercihen","Portfolyo zorunlu"] },
+  { id:6, title:"ML Engineer", company:"Zalando", companyColor:"#ec4899", companyInitials:"Z", type:"Full-time", location:"Berlin / Remote", salary:"€60K–€85K", dept:"AI/ML", isNew:true, poster:{name:"Lena Fischer",initials:"LF",color:"#ec4899",role:"ML Engineer"}, desc:"Zalando's fashion AI team is hiring ML engineers to build recommendation systems.", reqs:["PyTorch","Python","MLOps","3+ years exp"] },
+  { id:7, title:"Backend Engineer – Payments", company:"Stripe", companyColor:"#10b981", companyInitials:"S", type:"Remote", location:"Remote (Worldwide)", salary:"$120K–$160K", dept:"Engineering", isNew:true, poster:{name:"Carlos Mendez",initials:"CM",color:"#10b981",role:"Cloud Architect"}, desc:"Join Stripe's payments infrastructure team. Work on systems processing billions of dollars.", reqs:["Go or Java","Distributed systems","5+ years","API design"] },
+  { id:8, title:"Product Designer", company:"Spotify", companyColor:"#22c55e", companyInitials:"SP", type:"Full-time", location:"Stockholm", salary:"€55K–€75K", dept:"Design", isNew:false, poster:{name:"James Carter",initials:"JC",color:"#22c55e",role:"Product Director"}, desc:"Help shape the future of audio experiences for 600M+ users worldwide.", reqs:["Figma","Motion design","User research","Music passion"] },
+  { id:9, title:"Data Engineer", company:"Mercari", companyColor:"#f43f5e", companyInitials:"M", type:"Full-time", location:"Tokyo / Remote", salary:"¥8M–¥12M", dept:"Data", isNew:false, poster:{name:"Yuki Tanaka",initials:"YT",color:"#f43f5e",role:"Data Engineer"}, desc:"Build and maintain Mercari's data infrastructure powering Japan's largest marketplace.", reqs:["Spark","Kafka","GCP","4+ years"] },
+  { id:10, title:"DevOps Engineer", company:"PayTR", companyColor:"#22c55e", companyInitials:"PT", type:"Full-time", location:"İstanbul", salary:"40K–65K TL", dept:"Infrastructure", isNew:true, poster:{name:"Emre Çelik",initials:"EÇ",color:"#22c55e",role:"DevOps Engineer"}, desc:"Türkiye'nin önde gelen ödeme altyapısını yönetecek DevOps mühendisi arıyoruz.", reqs:["Kubernetes","Docker","Terraform","CI/CD"] },
+  { id:11, title:"AI Research Intern", company:"Cohere", companyColor:"#f97316", companyInitials:"C", type:"Internship", location:"Remote", salary:"$5K/month", dept:"Research", isNew:true, poster:{name:"Nadia Al-Rashid",initials:"NA",color:"#f97316",role:"AI Researcher"}, desc:"Work directly with researchers on cutting-edge language model development.", reqs:["NLP","Python","PyTorch","Research papers"] },
+  { id:12, title:"Frontend Engineer", company:"Delivery Hero", companyColor:"#06b6d4", companyInitials:"DH", type:"Full-time", location:"Berlin / Istanbul", salary:"€45K–€65K", dept:"Engineering", isNew:false, poster:{name:"Amira Hassan",initials:"AH",color:"#06b6d4",role:"Frontend Engineer"}, desc:"Build micro-frontends for the world's largest food delivery platform.", reqs:["Vue.js","TypeScript","Micro-frontends","GraphQL"] },
+  { id:13, title:"Mobile Developer – Flutter", company:"Turkcell", companyColor:"#ef4444", companyInitials:"TC", type:"Full-time", location:"İstanbul", salary:"45K–70K TL", dept:"Mobile", isNew:false, poster:{name:"Elif Demir",initials:"ED",color:"#ef4444",role:"Mobile Developer"}, desc:"Türkiye'nin en büyük telekom şirketinde mobil uygulama geliştirme.", reqs:["Flutter","Dart","REST APIs","Firebase"] },
+  { id:14, title:"Growth Marketing Manager", company:"Wise", companyColor:"#a855f7", companyInitials:"W", type:"Full-time", location:"London / Remote", salary:"£55K–£75K", dept:"Marketing", isNew:true, poster:{name:"Priya Sharma",initials:"PS",color:"#a855f7",role:"Product Manager"}, desc:"Drive growth for Wise's emerging markets expansion across 80+ countries.", reqs:["Performance Marketing","SQL","A/B Testing","Fintech"] },
+  { id:15, title:"Cybersecurity Analyst", company:"Klarna", companyColor:"#14b8a6", companyInitials:"K", type:"Full-time", location:"Stockholm / Remote", salary:"€65K–€90K", dept:"Security", isNew:false, poster:{name:"Erik Johansson",initials:"EJ",color:"#14b8a6",role:"Cybersecurity Lead"}, desc:"Protect Klarna's infrastructure serving 150M consumers across 45 countries.", reqs:["Pentesting","SIEM","Python","CISSP preferred"] },
+];
+
+// ════════════════════════════════════════════════
+//  DATA — CANDIDATES (for company view)
+// ════════════════════════════════════════════════
+const candidates = [
+  { id:1, name:"Ahmet Yılmaz", initials:"AY", color:"#6c63ff", dept:"Bil. Müh. 2024", skills:["React","Python","SQL"], match:94, status:"new" },
+  { id:2, name:"Defne Kara", initials:"DK", color:"#ec4899", dept:"Yazılım Müh. 2023", skills:["React","TypeScript","Node.js"], match:91, status:"review" },
+  { id:3, name:"Oğuz Demirtaş", initials:"OD", color:"#22c55e", dept:"Bil. Müh. 2024", skills:["Python","ML","TensorFlow"], match:87, status:"new" },
+  { id:4, name:"Sara Yıldız", initials:"SY", color:"#f59e0b", dept:"Endüstri Müh. 2023", skills:["Product","Agile","Analytics"], match:83, status:"new" },
+  { id:5, name:"Barış Akın", initials:"BA", color:"#3b82f6", dept:"Elektrik Müh. 2024", skills:["DevOps","Docker","AWS"], match:79, status:"review" },
+  { id:6, name:"Leyla Şen", initials:"LŞ", color:"#a855f7", dept:"Tasarım 2023", skills:["UX","Figma","User Research"], match:76, status:"new" },
+  { id:7, name:"Tom Weber", initials:"TW", color:"#14b8a6", dept:"CS 2024 (🇩🇪)", skills:["React","TypeScript","Testing"], match:88, status:"new" },
+  { id:8, name:"Aisha Patel", initials:"AP", color:"#f43f5e", dept:"Data Sci. 2023 (🇮🇳)", skills:["Python","ML","Spark"], match:92, status:"review" },
+  { id:9, name:"Kimchi Lee", initials:"KL", color:"#06b6d4", dept:"Software Eng. 2024 (🇰🇷)", skills:["Vue.js","Go","K8s"], match:85, status:"new" },
+];
+
+// ════════════════════════════════════════════════
+//  DATA — CONVERSATIONS
+// ════════════════════════════════════════════════
+const conversations = [
+  { id:1, name:"Selin Kaya", initials:"SK", color:"#6c63ff", preview:"Evet, yarın görüşebiliriz!", time:"10:24", isAI:true, messages:[
+    { mine:false, text:"Merhaba! Profilini inceledim, PM yolculuğun için yardımcı olmaktan mutluluk duyarım.", time:"10:15" },
+    { mine:true, text:"Merhaba Selin Hanım! Getir'deki deneyimlerinizi duymak istiyorum.", time:"10:18" },
+    { mine:false, text:"Tabii! Özellikle ürün roadmap yönetimi konusunda çok şey anlatabilirim.", time:"10:20" },
+    { mine:true, text:"Harika! Bu hafta uygun bir zaman var mı?", time:"10:22" },
+    { mine:false, text:"Evet, yarın görüşebiliriz!", time:"10:24" },
+  ]},
+  { id:2, name:"Trendyol İK", initials:"T", color:"#c44d3a", preview:"Başvurunuzu aldık, teşekkürler.", time:"Dün", isAI:true, messages:[
+    { mine:true, text:"Merhaba, Senior Frontend Developer pozisyonuna başvurdum.", time:"Dün 14:00" },
+    { mine:false, text:"Başvurunuzu aldık, teşekkürler. Teknik mülakat için sizi arayacağız.", time:"Dün 15:30" },
+  ]},
+];
+
+// ════════════════════════════════════════════════
+//  DEMO ACCOUNTS
+// ════════════════════════════════════════════════
+const demoAccounts = {
+  student: { type:'student', name:'Ahmet Yılmaz', initials:'AY', email:'ahmet@itu.edu.tr', dept:'Bilgisayar Mühendisliği', uni:'İstanbul Teknik Üniversitesi', year:'3. Sınıf', goal:'Product Manager', sector:'Fintech / SaaS', skills:'Python, React, SQL', city:'İstanbul', linkedin:'linkedin.com/in/ahmet', color:'#6c63ff' },
+  company: { type:'company', name:'Trendyol', initials:'T', email:'hr@trendyol.com', sector:'E-ticaret / Teknoloji', city:'İstanbul', color:'#c44d3a', website:'trendyol.com' }
+};
+
+// ════════════════════════════════════════════════
+//  PORTAL
+// ════════════════════════════════════════════════
+let portalType = 'student';
+function setPortalType(type) {
+  portalType = type;
+  document.getElementById('ptype-student').classList.toggle('active', type==='student');
+  document.getElementById('ptype-company').classList.toggle('active', type==='company');
+  document.getElementById('reg-student-fields').style.display = type==='student' ? 'flex' : 'none';
+  document.getElementById('reg-company-fields').style.display = type==='company' ? 'flex' : 'none';
+}
+
+function setPortalTab(tab) {
+  document.getElementById('ptab-login').classList.toggle('active', tab==='login');
+  document.getElementById('ptab-register').classList.toggle('active', tab==='register');
+  document.getElementById('pform-login').style.display = tab==='login' ? 'block' : 'none';
+  document.getElementById('pform-register').style.display = tab==='register' ? 'block' : 'none';
+}
+
+function doLogin() {
+  const email = document.getElementById('login-email').value.trim();
+  const pass = document.getElementById('login-pass').value;
+  const err = document.getElementById('login-err');
+  if (!email || !pass) { err.textContent = t('err_fill'); return; }
+  const type = (portalType==='company' || email.includes('hr@')) ? 'company' : 'student';
+  loginAs(type);
+}
+
+function doRegister() {
+  const name = document.getElementById('reg-name').value.trim();
+  const email = document.getElementById('reg-email').value.trim();
+  const err = document.getElementById('reg-err');
+  if (!name || !email) { err.textContent = t('err_fill'); return; }
+  currentUser = { type:'student', name, initials:name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase(), email, dept:document.getElementById('reg-dept').value||'', uni:'Üniversite', year:'1. Sınıf', goal:'', sector:'', skills:'', city:'', linkedin:'', color:'#6c63ff' };
+  launchApp();
+}
+
+function doCompanyRegister() {
+  const name = document.getElementById('reg-cname').value.trim();
+  const email = document.getElementById('reg-cemail').value.trim();
+  const err = document.getElementById('reg-cerr');
+  if (!name || !email) { err.textContent = t('err_fill'); return; }
+  currentUser = { type:'company', name, initials:name.slice(0,1).toUpperCase(), email, sector:document.getElementById('reg-csector').value||'', city:'', color:'#6c63ff', website:'' };
+  launchApp();
+}
+
+function loginAs(type) { currentUser = demoAccounts[type]; launchApp(); }
+function demoLogin(type) { loginAs(type); }
+
+function launchApp() {
+  document.getElementById('portalScreen').style.display = 'none';
+  document.getElementById('mainApp').style.display = 'flex';
+  updateNavUser();
+  renderAlumni();
+  renderConversations();
+  renderProfile();
+  if (currentUser.type==='company') { setupCompanyView(); }
+  applyI18n();
+}
+
+function updateNavUser() {
+  const u = currentUser;
+  document.getElementById('navAvatar').textContent = u.initials;
+  document.getElementById('navAvatar').style.background = u.color||'#6c63ff';
+  document.getElementById('navUserName').textContent = u.name;
+  const badge = document.getElementById('navBadge');
+  if (u.type==='company') {
+    badge.style.display = 'inline';
+    badge.textContent = t('company_badge');
+    const aiTab = document.querySelector('[onclick="showPage(\'ai\')"]');
+    if (aiTab) aiTab.style.display = 'none';
+  } else {
+    badge.style.display = 'none';
+  }
+}
+
+// ════════════════════════════════════════════════
+//  PAGES
+// ════════════════════════════════════════════════
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t2=>t2.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  const tabs=['home','jobs','ai','messages','profile'];
+  const idx=tabs.indexOf(name);
+  if(idx>=0) document.querySelectorAll('.nav-tab')[idx]?.classList.add('active');
+  if(name==='jobs') renderJobsView();
+}
+
+// ════════════════════════════════════════════════
+//  JOBS — STUDENT VIEW
+// ════════════════════════════════════════════════
+function renderJobsView() {
+  if (currentUser?.type==='company') {
+    document.getElementById('jobsStudentView').style.display='none';
+    document.getElementById('jobsCompanyView').style.display='block';
+    renderCompanyJobs();
+    renderCandidates();
+  } else {
+    document.getElementById('jobsStudentView').style.display='flex';
+    document.getElementById('jobsCompanyView').style.display='none';
+    renderJobList();
+  }
+}
+
+function filterJobs() { renderJobList(); }
+
+function setFilter(f, el) {
+  jobFilter=f;
+  document.querySelectorAll('.filter-chip').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active');
+  renderJobList();
+}
+
+function renderJobList() {
+  const search=(document.getElementById('jobSearchInput')?.value||'').toLowerCase();
+  let list=jobs.filter(j=>{
+    const ms=!search||j.title.toLowerCase().includes(search)||j.company.toLowerCase().includes(search);
+    const mf=jobFilter==='all'||j.type===jobFilter;
+    return ms&&mf;
+  });
+  document.getElementById('jobListItems').innerHTML=list.map(j=>`
+    <div class="job-list-item ${activeJobId===j.id?'active':''}" onclick="showJobDetail(${j.id})">
+      <div class="jli-company">
+        <div class="company-logo" style="background:${j.companyColor}">${j.companyInitials}</div>
+        <span class="jli-company-name">${j.company}</span>
+      </div>
+      <div class="jli-title">${j.title}</div>
+      <div class="jli-meta">
+        <span class="jli-tag jt-type">${localizeType(j.type)}</span>
+        <span class="jli-tag jt-loc">${j.location}</span>
+        ${j.isNew?`<span class="jli-tag jt-new">${t('badge_new')}</span>`:''}
+      </div>
+    </div>
+  `).join('');
+}
+
+function localizeType(type) {
+  const map = { 'Full-time': currentLang==='tr'?'Tam Zamanlı':'Full-time', 'Internship': currentLang==='tr'?'Staj':'Internship', 'Remote': 'Remote' };
+  return map[type]||type;
+}
+
+function showJobDetail(id) {
+  activeJobId=id;
+  renderJobList();
+  const j=jobs.find(x=>x.id===id);
+  if(!j) return;
+  document.getElementById('jobDetail').innerHTML=`
+    <div class="job-detail-header">
+      <div class="jdh-top">
+        <div class="company-logo-lg" style="background:${j.companyColor}">${j.companyInitials}</div>
+        <div>
+          <div class="jdh-title">${j.title}</div>
+          <div class="jdh-company">${j.company}</div>
+        </div>
+      </div>
+      <div class="jdh-tags">
+        <span class="jdh-tag jt-salary">${j.salary}</span>
+        <span class="jdh-tag jt-type">${localizeType(j.type)}</span>
+        <span class="jdh-tag jt-loc">${j.location}</span>
+        <span class="jdh-tag jt-dept">${j.dept}</span>
+      </div>
+      <div class="jdh-actions">
+        <button class="btn-apply" onclick="openApplyModal(${j.id})">${t('btn_apply_now')}</button>
+        <button class="btn-contact" onclick="contactCompany('${j.company}','${j.companyInitials}','${j.companyColor}')">${t('btn_contact_company')}</button>
+      </div>
+    </div>
+    <div class="job-section"><h3>${t('job_desc_title')}</h3><p>${j.desc}</p></div>
+    <div class="job-section"><h3>${t('job_reqs_title')}</h3><ul>${j.reqs.map(r=>`<li>${r}</li>`).join('')}</ul></div>
+    <div class="job-section"><h3>${t('job_poster_title')}</h3>
+      <div class="poster-card">
+        <div class="conv-av" style="background:${j.poster.color};width:42px;height:42px">${j.poster.initials}</div>
+        <div class="poster-info">
+          <div class="pname">${j.poster.name}</div>
+          <div class="prole">${j.poster.role}</div>
+          <div class="palumni">${t('poster_alumni_label')} · ${j.company}</div>
+        </div>
+        <button class="btn-sm" style="margin-left:auto" onclick="openDM('${j.poster.name}','${j.poster.initials}','${j.poster.color}')">${t('send_msg')}</button>
+      </div>
+    </div>
+  `;
+}
+
+function openApplyModal(jobId) {
+  activeJobId=jobId;
+  document.getElementById('applyFormView').style.display='block';
+  document.getElementById('applySuccessView').style.display='none';
+  document.getElementById('apply-cover').value='';
+  document.getElementById('apply-cv').value='';
+  document.getElementById('applyModal').style.display='flex';
+}
+
+function submitApply() {
+  document.getElementById('applyFormView').style.display='none';
+  document.getElementById('applySuccessView').style.display='block';
+  const j=jobs.find(x=>x.id===activeJobId);
+  if(j&&!conversations.find(c=>c.name===j.company+' HR')) {
+    conversations.push({id:conversations.length+1,name:j.company+' HR',initials:j.companyInitials,color:j.companyColor,preview:t('apply_auto_msg'),time:t('now'),isAI:true,messages:[{mine:false,text:t('apply_auto_msg'),time:t('now')}]});
+    renderConversations();
+  }
+}
+
+function resetApplyModal() {
+  document.getElementById('applyFormView').style.display='block';
+  document.getElementById('applySuccessView').style.display='none';
+}
+
+function contactCompany(name, initials, color) {
+  openDM(name+' HR', initials, color);
+}
+
+// ════════════════════════════════════════════════
+//  JOBS — COMPANY VIEW
+// ════════════════════════════════════════════════
+function setupCompanyView() {
+  const u=currentUser;
+  document.getElementById('cdashLogo').textContent=u.initials;
+  document.getElementById('cdashLogo').style.background=u.color;
+  document.getElementById('cdashName').textContent=u.name;
+  document.getElementById('cdashSub').textContent=u.sector||'';
+  companyJobs=jobs.filter(j=>j.company===u.name);
+  if(!companyJobs.length) {
+    companyJobs=[{id:99,title:"Software Engineer",company:u.name,companyColor:u.color,companyInitials:u.initials,type:"Full-time",location:"İstanbul",salary:"40K TL",dept:"Engineering",isNew:true,poster:{name:u.name,initials:u.initials,color:u.color,role:"HR"},desc:"Sample position.",reqs:[]}];
+  }
+}
+
+function renderCompanyJobs() {
+  document.getElementById('cds-active').textContent=companyJobs.length;
+  document.getElementById('companyJobsGrid').innerHTML=companyJobs.map(j=>`
+    <div class="cjob-card">
+      <div class="cjob-title">${j.title}</div>
+      <div class="cjob-meta">
+        <span class="jli-tag jt-type">${localizeType(j.type)}</span>
+        <span class="jli-tag jt-loc">${j.location}</span>
+        ${j.isNew?`<span class="jli-tag jt-new">${t('badge_new')}</span>`:''}
+      </div>
+      <div class="cjob-actions">
+        <button class="btn-edit-job" onclick="showToast(t('toast_edit_coming'))">${t('btn_edit')}</button>
+        <button class="btn-del-job" onclick="deleteJob(${j.id})">${t('btn_delete')}</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function openPostJobModal() { document.getElementById('postJobModal').style.display='flex'; }
+
+function postJob() {
+  const title=document.getElementById('pj-title').value.trim();
+  if(!title){showToast(t('err_fill'));return;}
+  const u=currentUser;
+  const newJob={
+    id:Date.now(),title,company:u.name,companyColor:u.color,companyInitials:u.initials,
+    type:document.getElementById('pj-type').value,
+    location:document.getElementById('pj-location').value||'İstanbul',
+    salary:document.getElementById('pj-salary').value||'—',
+    dept:document.getElementById('pj-dept').value||'',
+    isNew:true,poster:{name:u.name,initials:u.initials,color:u.color,role:'HR'},
+    desc:document.getElementById('pj-desc').value||'',
+    reqs:(document.getElementById('pj-reqs').value||'').split(',').map(s=>s.trim()).filter(Boolean)
+  };
+  jobs.push(newJob);companyJobs.push(newJob);
+  closeModal('postJobModal');renderCompanyJobs();
+  showToast(t('toast_job_posted'));
+}
+
+function deleteJob(id) {
+  const idx=companyJobs.findIndex(j=>j.id===id);
+  if(idx>-1)companyJobs.splice(idx,1);
+  jobs.splice(jobs.findIndex(j=>j.id===id),1);
+  renderCompanyJobs();showToast(t('toast_job_deleted'));
+}
+
+// ════════════════════════════════════════════════
+//  CANDIDATE FILTER
+// ════════════════════════════════════════════════
+function renderCandidates() {
+  filterCandidates();
+}
+
+function filterCandidates() {
+  const search=(document.getElementById('candSearch')?.value||'').toLowerCase();
+  const skill=document.getElementById('candSkillFilter')?.value||'';
+  const status=document.getElementById('candStatusFilter')?.value||'';
+  const minMatch=parseInt(document.getElementById('candMatchFilter')?.value||'0');
+
+  let list=candidates.filter(c=>{
+    const ms=!search||c.name.toLowerCase().includes(search)||c.dept.toLowerCase().includes(search);
+    const msk=!skill||c.skills.some(s=>s.toLowerCase().includes(skill.toLowerCase()));
+    const mst=!status||c.status===status;
+    const mm=c.match>=minMatch;
+    return ms&&msk&&mst&&mm;
+  });
+
+  const g=document.getElementById('candidatesGrid');
+  if(!g)return;
+  g.innerHTML=list.map(c=>`
+    <div class="candidate-card" onclick="openDM('${c.name}','${c.initials}','${c.color}')">
+      <div class="cand-top">
+        <div class="cand-av" style="background:${c.color}">${c.initials}</div>
+        <div><div class="cand-name">${c.name}</div><div class="cand-role">${c.dept}</div></div>
+      </div>
+      <div class="cand-skills">${c.skills.map(s=>`<span class="tag">${s}</span>`).join('')}</div>
+      <div class="cand-match-row">
+        <span class="match-badge ${c.match>=85?'match-high':'match-med'}">%${c.match} ${t('match_label')}</span>
+        <span class="cand-status ${c.status==='new'?'status-new':'status-review'}">${c.status==='new'?t('status_new_opt'):t('status_review_opt')}</span>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ════════════════════════════════════════════════
+//  ALUMNI GRID
+// ════════════════════════════════════════════════
+function renderAlumni() {
+  const grid=document.getElementById('alumniGrid');
+  grid.innerHTML=alumni.map(a=>`
+    <div class="alumni-card" onclick="openDM('${a.name}','${a.initials}','${a.color}')">
+      <div class="alumni-card-top">
+        <div class="alumni-av" style="background:${a.color}">${a.initials}</div>
+        <div>
+          <div class="alumni-name">${a.country} ${a.name}</div>
+          <div class="alumni-role-small">${a.dept}</div>
+        </div>
+      </div>
+      <div class="alumni-company">${a.role} · ${a.company}</div>
+      <div class="alumni-tags">${a.tags.map(tg=>`<span class="tag">${tg}</span>`).join('')}</div>
+      <div class="card-footer">
+        <span class="match-badge ${a.match>=85?'match-high':'match-med'}">%${a.match} ${t('match_label')}</span>
+        <button class="btn-sm">${t('send_msg')}</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ════════════════════════════════════════════════
+//  MESSAGES + GEMINI AI REPLIES
+// ════════════════════════════════════════════════
+function renderConversations() {
+  document.getElementById('convList').innerHTML=conversations.map(c=>`
+    <div class="conv-item ${activeConv===c.id?'active':''}" onclick="openConv(${c.id})">
+      <div class="conv-av" style="background:${c.color}">${c.initials}</div>
+      <div style="flex:1;min-width:0">
+        <div class="conv-name">${c.name}</div>
+        <div class="conv-preview">${c.preview||''}</div>
+      </div>
+      <div class="conv-time">${c.time}</div>
+    </div>
+  `).join('');
+}
+
+function openConv(id) {
+  activeConv=id;
+  const conv=conversations.find(c=>c.id===id);
+  renderConversations();
+  document.getElementById('dmArea').innerHTML=`
+    <div class="dm-header">
+      <div class="conv-av" style="background:${conv.color};width:34px;height:34px;font-size:11px">${conv.initials}</div>
+      <div><div style="font-weight:600;font-size:13px">${conv.name}</div><div style="font-size:11px;color:var(--text3)">${t('online')}</div></div>
+      <div class="dm-ai-badge">ALCOP AI</div>
+    </div>
+    <div class="dm-messages" id="dmMsgs">
+      ${conv.messages.map(m=>`
+        <div class="dm-msg ${m.mine?'mine':''}">
+          ${!m.mine?`<div class="conv-av" style="background:${conv.color};width:26px;height:26px;font-size:9px;flex-shrink:0">${conv.initials}</div>`:''}
+          <div><div class="dm-bubble">${m.text}</div><div class="dm-time">${m.time}</div></div>
+        </div>
+      `).join('')}
+    </div>
+    <div class="dm-input-area">
+      <input class="dm-input" id="dmInput" data-i18n-placeholder="dm_placeholder" placeholder="${t('dm_placeholder')}" onkeydown="sendDM(event,${conv.id})">
+      <button class="send-btn" onclick="sendDMBtn(${conv.id})" style="width:38px;height:38px">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+      </button>
+    </div>
+  `;
+}
+
+function sendDM(e,convId){if(e.key==='Enter')sendDMBtn(convId);}
+
+async function sendDMBtn(convId) {
+  const input=document.getElementById('dmInput');
+  const text=input.value.trim();
+  if(!text)return;
+  const conv=conversations.find(c=>c.id===convId);
+  const now=new Date();
+  const timeStr=`${now.getHours()}:${String(now.getMinutes()).padStart(2,'0')}`;
+  conv.messages.push({mine:true,text,time:timeStr});
+  conv.preview=text;
+  input.value='';
+  const msgs=document.getElementById('dmMsgs');
+  const div=document.createElement('div');
+  div.className='dm-msg mine';
+  div.innerHTML=`<div><div class="dm-bubble">${escHtml(text)}</div><div class="dm-time">${timeStr}</div></div>`;
+  msgs.appendChild(div);msgs.scrollTop=msgs.scrollHeight;
+  renderConversations();
+
+  // GEMINI AI REPLY
+  if(conv.isAI) {
+    const typDiv=document.createElement('div');
+    typDiv.className='dm-msg';typDiv.id='dm-typing';
+    typDiv.innerHTML=`<div class="conv-av" style="background:${conv.color};width:26px;height:26px;font-size:9px;flex-shrink:0">${conv.initials}</div><div><div class="typing-indicator"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div></div>`;
+    msgs.appendChild(typDiv);msgs.scrollTop=msgs.scrollHeight;
+
+    try {
+      const lang=currentLang==='tr'?'Türkçe':'English';
+      const sysPrompt=`Sen ${conv.name} adlı ${conv.name.includes('İK')||conv.name.includes('HR')?'bir şirket İK yetkilisi':'bir kariyer mentorü'}sun. ALCOP platformunda öğrencilere yardım ediyorsun. ${lang} yanıt ver. Kısa, samimi ve yardımsever ol.`;
+      const history=conv.messages.slice(-6).map(m=>({role:m.mine?'user':'model',parts:[{text:m.text}]}));
+      const resp=await fetch(GEMINI_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({system_instruction:{parts:[{text:sysPrompt}]},contents:history,generationConfig:{maxOutputTokens:300,temperature:0.8}})});
+      const data=await resp.json();
+      const reply=data.candidates?.[0]?.content?.parts?.[0]?.text||t('error_generic');
+      document.getElementById('dm-typing')?.remove();
+      const replyTime=`${now.getHours()}:${String(now.getMinutes()).padStart(2,'0')}`;
+      conv.messages.push({mine:false,text:reply,time:replyTime});
+      conv.preview=reply.slice(0,40)+'...';
+      const rd=document.createElement('div');
+      rd.className='dm-msg';
+      rd.innerHTML=`<div class="conv-av" style="background:${conv.color};width:26px;height:26px;font-size:9px;flex-shrink:0">${conv.initials}</div><div><div class="dm-bubble">${escHtml(reply)}</div><div class="dm-time">${replyTime}</div></div>`;
+      msgs.appendChild(rd);msgs.scrollTop=msgs.scrollHeight;
+      renderConversations();
+    } catch(err) {
+      document.getElementById('dm-typing')?.remove();
+    }
+  }
+}
+
+function openDM(name, initials, color) {
+  let conv=conversations.find(c=>c.name===name);
+  if(!conv){
+    conv={id:conversations.length+1,name,initials,color,preview:'',time:t('now'),isAI:true,messages:[{mine:false,text:t('dm_intro'),time:t('now')}]};
+    conversations.push(conv);
+  }
+  showPage('messages');
+  renderConversations();
+  setTimeout(()=>openConv(conv.id),50);
+}
+
+// ════════════════════════════════════════════════
+//  PROFILE
+// ════════════════════════════════════════════════
+function renderProfile() {
+  const u=currentUser;if(!u)return;
+  const container=document.getElementById('profileContent');
+  if(u.type==='company'){
+    container.innerHTML=`
+      <div class="profile-header">
+        <div class="profile-av-lg" style="background:${u.color}">${u.initials}</div>
+        <div class="profile-info">
+          <h2>${u.name}</h2>
+          <div class="profile-role-text">${u.sector||'—'} · ${u.city||'—'}</div>
+          <div class="profile-tags"><span class="profile-tag pt-goal">${t('label_company_account')}</span></div>
+        </div>
+        <button class="btn-sm" style="margin-left:auto;align-self:flex-start" onclick="openEditProfile()">${t('edit_profile')}</button>
+      </div>
+      <div class="profile-cards">
+        <div class="p-card">
+          <div class="p-card-title">${t('company_info')} <span class="edit-link" onclick="openEditProfile()">${t('edit')}</span></div>
+          <div class="info-row"><span class="info-label">${t('label_company_name')}</span><span class="info-val">${u.name}</span></div>
+          <div class="info-row"><span class="info-label">${t('label_sector')}</span><span class="info-val">${u.sector||'—'}</span></div>
+          <div class="info-row"><span class="info-label">${t('label_email')}</span><span class="info-val">${u.email||'—'}</span></div>
+          <div class="info-row"><span class="info-label">${t('label_location')}</span><span class="info-val">${u.city||'—'}</span></div>
+          <div class="info-row"><span class="info-label">${t('label_website')}</span><span class="info-val" style="color:var(--accent2)">${u.website||'—'}</span></div>
+        </div>
+        <div class="p-card">
+          <div class="p-card-title">${t('activity')}</div>
+          <div class="info-row"><span class="info-label">${t('cds_active')}</span><span class="info-val">${companyJobs.length||0}</span></div>
+          <div class="info-row"><span class="info-label">${t('cds_apps')}</span><span class="info-val">24</span></div>
+          <div class="info-row"><span class="info-label">${t('cds_msgs')}</span><span class="info-val">8</span></div>
+          <div class="info-row"><span class="info-label">${t('cds_alumni')}</span><span class="info-val">5</span></div>
+        </div>
+      </div>`;
+  } else {
+    container.innerHTML=`
+      <div class="profile-header">
+        <div class="profile-av-lg" style="background:${u.color||'#6c63ff'}">${u.initials}</div>
+        <div class="profile-info">
+          <h2>${u.name}</h2>
+          <div class="profile-role-text">${u.dept||'—'}, ${u.year||'—'} · ${u.uni||'—'}</div>
+          <div class="profile-tags">
+            <span class="profile-tag pt-goal">${t('label_goal')}: ${u.goal||'—'}</span>
+            ${(u.skills||'').split(',').filter(s=>s.trim()).map(s=>`<span class="profile-tag pt-skill">${s.trim()}</span>`).join('')}
+          </div>
+        </div>
+        <button class="btn-sm" style="margin-left:auto;align-self:flex-start" onclick="openEditProfile()">${t('edit_profile')}</button>
+      </div>
+      <div class="profile-cards">
+        <div class="p-card">
+          <div class="p-card-title">${t('personal_info')} <span class="edit-link" onclick="openEditProfile()">${t('edit')}</span></div>
+          <div class="info-row"><span class="info-label">${t('label_email')}</span><span class="info-val">${u.email||'—'}</span></div>
+          <div class="info-row"><span class="info-label">${t('label_dept')}</span><span class="info-val">${u.dept||'—'}</span></div>
+          <div class="info-row"><span class="info-label">${t('label_year')}</span><span class="info-val">${u.year||'—'}</span></div>
+          <div class="info-row"><span class="info-label">${t('label_city')}</span><span class="info-val">${u.city||'—'}</span></div>
+          <div class="info-row"><span class="info-label">LinkedIn</span><span class="info-val" style="color:var(--accent2)">${u.linkedin||'—'}</span></div>
+        </div>
+        <div class="p-card">
+          <div class="p-card-title">${t('career_goals')} <span class="edit-link" onclick="openEditProfile()">${t('edit')}</span></div>
+          <div class="info-row"><span class="info-label">${t('label_goal')}</span><span class="info-val">${u.goal||'—'}</span></div>
+          <div class="info-row"><span class="info-label">${t('label_sector')}</span><span class="info-val">${u.sector||'—'}</span></div>
+          <div class="info-row"><span class="info-label">${t('label_skills')}</span><span class="info-val">${u.skills||'—'}</span></div>
+        </div>
+        <div class="p-card">
+          <div class="p-card-title">${t('mentor_activity')}</div>
+          <div class="info-row"><span class="info-label">${t('total_sessions')}</span><span class="info-val">4</span></div>
+          <div class="info-row"><span class="info-label">${t('active_mentors')}</span><span class="info-val">2</span></div>
+          <div class="info-row"><span class="info-label">${t('ai_sessions')}</span><span class="info-val">12</span></div>
+        </div>
+        <div class="p-card">
+          <div class="p-card-title">${t('skill_set')}</div>
+          <div class="info-row"><span class="info-label">${t('technical')}</span><span class="info-val">${u.skills||'—'}</span></div>
+          <div class="info-row"><span class="info-label">${t('label_city')}</span><span class="info-val">${u.city||'—'}</span></div>
+          <div class="info-row"><span class="info-label">${t('label_uni')}</span><span class="info-val">${u.uni||'—'}</span></div>
+        </div>
+      </div>`;
+  }
+}
+
+function openEditProfile() {
+  const u=currentUser;
+  const fields=document.getElementById('editProfileFields');
+  if(u.type==='company'){
+    fields.innerHTML=`
+      <div class="modal-group full"><label class="modal-label">${t('label_company_name')}</label><input class="modal-input" id="ep-cname" value="${u.name}"></div>
+      <div class="modal-group"><label class="modal-label">${t('label_sector')}</label><input class="modal-input" id="ep-csector" value="${u.sector||''}"></div>
+      <div class="modal-group"><label class="modal-label">${t('label_email')}</label><input class="modal-input" id="ep-cemail" value="${u.email||''}"></div>
+      <div class="modal-group"><label class="modal-label">${t('label_location')}</label><input class="modal-input" id="ep-ccity" value="${u.city||''}"></div>
+      <div class="modal-group full"><label class="modal-label">${t('label_website')}</label><input class="modal-input" id="ep-cwebsite" value="${u.website||''}"></div>`;
+  } else {
+    fields.innerHTML=`
+      <div class="modal-group"><label class="modal-label">${t('label_fullname')}</label><input class="modal-input" id="ep-name" value="${u.name}"></div>
+      <div class="modal-group"><label class="modal-label">${t('label_email')}</label><input class="modal-input" id="ep-email" value="${u.email||''}"></div>
+      <div class="modal-group"><label class="modal-label">${t('label_dept')}</label><input class="modal-input" id="ep-dept" value="${u.dept||''}"></div>
+      <div class="modal-group"><label class="modal-label">${t('label_year')}</label><input class="modal-input" id="ep-year" value="${u.year||''}"></div>
+      <div class="modal-group"><label class="modal-label">${t('label_uni')}</label><input class="modal-input" id="ep-uni" value="${u.uni||''}"></div>
+      <div class="modal-group"><label class="modal-label">${t('label_city')}</label><input class="modal-input" id="ep-city" value="${u.city||''}"></div>
+      <div class="modal-group full"><label class="modal-label">${t('label_goal')}</label><input class="modal-input" id="ep-goal" value="${u.goal||''}"></div>
+      <div class="modal-group"><label class="modal-label">${t('label_sector')}</label><input class="modal-input" id="ep-sector" value="${u.sector||''}"></div>
+      <div class="modal-group"><label class="modal-label">${t('label_skills')}</label><input class="modal-input" id="ep-skills" value="${u.skills||''}"></div>
+      <div class="modal-group full"><label class="modal-label">LinkedIn</label><input class="modal-input" id="ep-linkedin" value="${u.linkedin||''}"></div>`;
+  }
+  document.getElementById('editProfileModal').style.display='flex';
+}
+
+function saveProfile() {
+  const u=currentUser;
+  if(u.type==='company'){
+    u.name=document.getElementById('ep-cname')?.value||u.name;
+    u.sector=document.getElementById('ep-csector')?.value||u.sector;
+    u.email=document.getElementById('ep-cemail')?.value||u.email;
+    u.city=document.getElementById('ep-ccity')?.value||u.city;
+    u.website=document.getElementById('ep-cwebsite')?.value||u.website;
+    u.initials=u.name.slice(0,1).toUpperCase();
+  } else {
+    u.name=document.getElementById('ep-name')?.value||u.name;
+    u.email=document.getElementById('ep-email')?.value||u.email;
+    u.dept=document.getElementById('ep-dept')?.value||u.dept;
+    u.year=document.getElementById('ep-year')?.value||u.year;
+    u.uni=document.getElementById('ep-uni')?.value||u.uni;
+    u.city=document.getElementById('ep-city')?.value||u.city;
+    u.goal=document.getElementById('ep-goal')?.value||u.goal;
+    u.sector=document.getElementById('ep-sector')?.value||u.sector;
+    u.skills=document.getElementById('ep-skills')?.value||u.skills;
+    u.linkedin=document.getElementById('ep-linkedin')?.value||u.linkedin;
+    u.initials=u.name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+  }
+  closeModal('editProfileModal');
+  updateNavUser();
+  renderProfile();
+  showToast(t('toast_profile_saved'));
+}
+
+// ════════════════════════════════════════════════
+//  AI CHAT — GEMINI
+// ════════════════════════════════════════════════
+const modeConfig={
+  mentor:    {get title(){return t('mode_mentor_title')},    get sys(){return buildSys('mentor')}},
+  roadmap:   {get title(){return t('mode_roadmap_title')},   get sys(){return buildSys('roadmap')}},
+  cv:        {get title(){return t('mode_cv_title')},        get sys(){return buildSys('cv')}},
+  salary:    {get title(){return t('mode_salary_title')},    get sys(){return buildSys('salary')}},
+  interview: {get title(){return t('mode_interview_title')}, get sys(){return buildSys('interview')}},
+  sector:    {get title(){return t('mode_sector_title')},    get sys(){return buildSys('sector')}},
+};
+
+function buildSys(mode) {
+  const lang=currentLang==='tr'?'Türkçe':'English';
+  const u=currentUser||demoAccounts.student;
+  const note=`${lang} yanıt ver. Sen ALCOP AI'sın — Alumni Connect Platform'un kariyer asistanı. Gemini tarafından destekleniyorsun.`;
+  const systems={
+    mentor:note+` Kullanıcı: ${u.name}. Mentor eşleştirme konusunda yardım et. Mevcut mezunlar: Selin Kaya (PM/Getir %94), Mert Özdemir (SWE/Trendyol %88), Lena Fischer (ML/Zalando %86), Priya Sharma (PM/Wise %89), Nadia Al-Rashid (AI/Cohere %91). Somut ve motive edici ol.`,
+    roadmap:note+` Kullanıcı için detaylı kariyer yol haritası oluştur. Zaman çerçevesi, öğrenilecek teknolojiler, sertifikalar, kaynaklar belirt.`,
+    cv:note+` CV analiz asistanısın. Somut iyileştirme önerileri ver, örnek bullet point'ler yaz.`,
+    salary:note+` Türkiye ve global teknoloji sektörü maaş bilgisi ver. 2024-2025 güncel rakamlar, şehir/deneyim/şirket farklılıkları.`,
+    interview:note+` Mülakat koçusun. STAR metodunu öğret, sorular sor, cevapları analiz et.`,
+    sector:note+` Sektör analisti. 2024-2025 teknoloji trendleri, büyüyen alanlar, in-demand roller paylaş.`,
+  };
+  return systems[mode];
+}
+
+function setMode(mode, el) {
+  currentMode=mode;chatHistory=[];
+  document.querySelectorAll('.option-item').forEach(i=>i.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('chatTitle').textContent=modeConfig[mode].title;
+  document.getElementById('chatMessages').innerHTML=`<div class="msg ai"><div class="msg-av msg-ai-av">✦</div><div class="msg-bubble"><p>${t('mode_changed')}: <strong>${modeConfig[mode].title}</strong></p><p>${t('mode_help')}</p></div></div>`;
+}
+
+function sendQuick(text){document.getElementById('chatInput').value=text;sendMessage();}
+function handleKey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMessage();}}
+function autoResize(el){el.style.height='auto';el.style.height=Math.min(el.scrollHeight,120)+'px';}
+
+async function sendMessage() {
+  if(isLoading)return;
+  const input=document.getElementById('chatInput');
+  const text=input.value.trim();
+  if(!text)return;
+  input.value='';input.style.height='auto';
+  addUserMsg(text);
+  chatHistory.push({role:'user',parts:[{text}]});
+  isLoading=true;
+  document.getElementById('sendBtn').disabled=true;
+  const typId=addTyping();
+
+  try {
+    const sysInstruction=modeConfig[currentMode].sys;
+    const resp=await fetch(GEMINI_URL,{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        system_instruction:{parts:[{text:sysInstruction}]},
+        contents:chatHistory,
+        generationConfig:{maxOutputTokens:1000,temperature:0.8}
+      })
+    });
+    removeTyping(typId);
+    const data=await resp.json();
+    const reply=data.candidates?.[0]?.content?.parts?.[0]?.text||t('error_generic');
+    chatHistory.push({role:'model',parts:[{text:reply}]});
+    addAIMsg(reply);
+  } catch(err) {
+    removeTyping(typId);
+    addAIMsg(t('error_conn'));
+  }
+  isLoading=false;
+  document.getElementById('sendBtn').disabled=false;
+}
+
+function addUserMsg(text){
+  const msgs=document.getElementById('chatMessages');
+  const d=document.createElement('div');d.className='msg user';
+  d.innerHTML=`<div class="msg-av msg-user-av">${currentUser?.initials||'U'}</div><div class="msg-bubble">${escHtml(text)}</div>`;
+  msgs.appendChild(d);msgs.scrollTop=msgs.scrollHeight;
+}
+function addAIMsg(text){
+  const msgs=document.getElementById('chatMessages');
+  const d=document.createElement('div');d.className='msg ai';
+  d.innerHTML=`<div class="msg-av msg-ai-av">✦</div><div class="msg-bubble">${formatMsg(text)}</div>`;
+  msgs.appendChild(d);msgs.scrollTop=msgs.scrollHeight;
+}
+function addTyping(){
+  const msgs=document.getElementById('chatMessages');
+  const id='typ-'+Date.now();
+  const d=document.createElement('div');d.className='msg ai';d.id=id;
+  d.innerHTML=`<div class="msg-av msg-ai-av">✦</div><div class="typing-indicator"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div>`;
+  msgs.appendChild(d);msgs.scrollTop=msgs.scrollHeight;return id;
+}
+function removeTyping(id){document.getElementById(id)?.remove();}
+
+function formatMsg(text){
+  return text
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')
+    .replace(/\*(.*?)\*/g,'<em>$1</em>')
+    .replace(/^#{1,3} (.+)$/gm,'<strong>$1</strong>')
+    .replace(/^[-•] (.+)/gm,'<li>$1</li>')
+    .replace(/(<li>[\s\S]*?<\/li>)/g,'<ul>$1</ul>')
+    .replace(/\n\n/g,'</p><p>').replace(/\n/g,'<br>')
+    .replace(/^([^<].+)$/,'<p>$1</p>');
+}
+function escHtml(t2){return t2.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+// ════════════════════════════════════════════════
+//  MODALS & TOAST
+// ════════════════════════════════════════════════
+function closeModal(id){document.getElementById(id).style.display='none';}
+function showToast(msg){
+  const old=document.querySelector('.toast');if(old)old.remove();
+  const el=document.createElement('div');el.className='toast';el.textContent=msg;
+  document.body.appendChild(el);setTimeout(()=>el.remove(),3000);
+}
+
+// ════════════════════════════════════════════════
+//  i18n — FULL TR / EN
+// ════════════════════════════════════════════════
+const i18n={
+  tr:{
+    portal_fullname:'Alumni Connect Platform',
+    portal_hero_title:'Kariyerine <span style="background:linear-gradient(135deg,#6c63ff,#8b85ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">yön ver</span>,<br>mezunlarla bağlan.',
+    portal_hero_sub:'AI destekli eşleştirme ile sana en uygun mentorları, iş ilanlarını ve kariyer rehberliğini sunuyoruz.',
+    stat_alumni:'Aktif Mezun', stat_companies:'Şirket', stat_match:'Eşleşme Başarısı',
+    badge_ai:'AI Destekli', badge_global:'Global Ağ', badge_mentor:'Mentorluk', badge_rnu:'RNU Platformu',
+    ptype_student:'Öğrenci / Mezun', ptype_company:'Şirket',
+    ptab_login:'Giriş Yap', ptab_register:'Kayıt Ol',
+    login_title:'Tekrar hoş geldin', login_sub:'Hesabına giriş yap',
+    register_title:'Hesap oluştur', register_sub:'ALCOP topluluğuna katıl',
+    label_email:'E-posta', label_password:'Şifre', label_fullname:'Ad Soyad',
+    label_dept:'Bölüm', label_type:'Tür', label_company_name:'Şirket Adı',
+    label_sector:'Sektör', label_year:'Sınıf / Yıl', label_uni:'Üniversite',
+    label_city:'Şehir', label_goal:'Kariyer Hedefi', label_skills:'Beceriler',
+    label_website:'Web Sitesi', label_location:'Lokasyon', label_salary:'Maaş Aralığı',
+    label_job_title:'Pozisyon Başlığı', label_job_type:'İlan Türü',
+    label_description:'Açıklama', label_requirements:'Gereksinimler',
+    label_cover:'Ön Yazı', label_cv_link:'CV Linki', label_company_account:'Şirket Hesabı',
+    ph_email:'ornek@universite.edu.tr', ph_fullname:'Ahmet Yılmaz',
+    ph_dept:'Bilgisayar Mühendisliği', ph_sector:'E-ticaret / Teknoloji',
+    ph_job_search:'İlan ara...', ph_dept_eng:'Mühendislik',
+    ph_cover:'Neden bu pozisyon için uygunsunuz?',
+    ph_cand_search:'Aday ara...',
+    opt_student:'Öğrenci', opt_alumni:'Mezun',
+    opt_fulltime:'Tam Zamanlı', opt_intern:'Staj', opt_remote:'Uzaktan',
+    btn_login:'Giriş Yap', btn_register:'Kayıt Ol',
+    or_demo:'veya demo ile dene',
+    demo_student:'Öğrenci Demo', demo_company:'Şirket Demo',
+    err_fill:'Lütfen tüm alanları doldurun.',
+    nav_explore:'Keşfet', nav_jobs:'İlanlar', nav_ai:'ALCOP AI',
+    nav_messages:'Mesajlar', nav_profile:'Profil',
+    company_badge:'ŞİRKET',
+    hero_badge:'AI Destekli Kariyer Platformu',
+    hero_title:'Kariyerine <em>yön ver</em>,<br>mezunlarla bağlan.',
+    hero_sub:'AI destekli eşleştirme ile sana en uygun mentorları buluyoruz. Gerçek kariyer tavsiyeleri, gerçek bağlantılar.',
+    hero_btn1:'ALCOP AI ile Planla', hero_btn2:'İlanları Gör',
+    stat1:'Aktif Mezun', stat2:'Eşleştirme Başarısı', stat3:'Şirket Ortağı', stat4:'Ülke',
+    suggested_alumni:'Sana Önerilen Mezunlar',
+    match_label:'eşleşme', send_msg:'Mesaj Gönder',
+    filter_all:'Tümü', filter_fulltime:'Tam Zamanlı', filter_intern:'Staj', filter_remote:'Uzaktan',
+    filter_all_skills:'Tüm Beceriler', filter_all_status:'Tüm Durumlar', filter_all_match:'Tüm Eşleşmeler',
+    filter_match_90:'%90+', filter_match_80:'%80+', filter_match_70:'%70+',
+    badge_new:'Yeni', job_select_prompt:'Bir ilan seçin',
+    btn_apply_now:'Hemen Başvur', btn_contact_company:'Şirkete Yaz',
+    job_desc_title:'Pozisyon Açıklaması', job_reqs_title:'Gereksinimler',
+    job_poster_title:'İlanı Paylaşan Alumni', poster_alumni_label:'Çalışan Alumni',
+    cds_active:'Aktif İlan', cds_apps:'Başvuru', cds_msgs:'Mesaj', cds_alumni:'Alumni',
+    my_postings:'İlanlarım', btn_post_job:'+ Yeni İlan',
+    candidate_title:'Aday Havuzu',
+    status_new_opt:'Yeni', status_review_opt:'İncelemede',
+    btn_edit:'Düzenle', btn_delete:'Sil',
+    modal_edit_title:'Profili Düzenle', modal_post_job:'Yeni İlan Oluştur',
+    modal_apply:'Başvur', btn_apply:'Başvuruyu Gönder',
+    btn_cancel:'İptal', btn_save:'Kaydet', btn_close:'Kapat',
+    apply_success_title:'Başvurunuz Alındı!',
+    apply_success_sub:'Şirket en kısa sürede sizinle iletişime geçecek.',
+    apply_auto_msg:'Başvurunuzu aldık, en kısa sürede dönüş yapacağız.',
+    ai_sidebar_sub:'Gemini ile güçlendirilmiş',
+    mode_mentor_title:'Mentor Eşleştirme', mode_mentor_sub:'En uygun mezunu bul',
+    mode_roadmap_title:'Kariyer Yol Haritası', mode_roadmap_sub:'Hedefine adım adım',
+    mode_cv_title:'CV Analizi', mode_cv_sub:"CV'ni güçlendir",
+    mode_salary_title:'Maaş Rehberi', mode_salary_sub:'Sektör maaşlarını öğren',
+    mode_interview_title:'Mülakat Hazırlığı', mode_interview_sub:'Sorular ve teknikler',
+    mode_sector_title:'Sektör Analizi', mode_sector_sub:'Trend ve fırsatlar',
+    chat_header_sub:'ALCOP AI — Gemini Destekli',
+    ai_online:'Çevrimiçi',
+    qp1:'Yazılım kariyeri planla', qp1_msg:'Yazılım sektöründe kariyer planı oluştur',
+    qp2:'Mentor öner', qp2_msg:'Bana uygun mentor öner',
+    qp3:'CV güçlendir', qp3_msg:"CV'mi nasıl güçlendirebilirim?",
+    qp4:'Sektör trendleri', qp4_msg:'2025 iş piyasasındaki trendler neler?',
+    chat_placeholder:'Sorunuzu yazın...',
+    greeting:'Merhaba! 👋 Ben ALCOP AI, kariyer asistanınım.',
+    greeting2:'Mentor eşleştirme, kariyer yol haritası, CV analizi ve daha fazlası için buradayım.',
+    greeting3:'Nasıl yardımcı olabilirim?',
+    mode_changed:'Mod değiştirildi', mode_help:'Bu konuda nasıl yardımcı olabilirim?',
+    error_conn:'Bağlantı hatası. Tekrar deneyin.', error_generic:'Bir hata oluştu.',
+    messages_title:'Mesajlar', select_conv:'Bir konuşma seçin',
+    gemini_powered:'Gemini AI ile destekleniyor',
+    online:'Çevrimiçi', dm_placeholder:'Mesaj yaz...',
+    dm_intro:'Merhaba! Kariyer yolculuğunuzda yardımcı olmaktan mutluluk duyarım.',
+    now:'Şimdi',
+    edit_profile:'Profili Düzenle', edit:'Düzenle',
+    personal_info:'Kişisel Bilgiler', career_goals:'Kariyer Hedefleri',
+    mentor_activity:'Mentor Aktivitesi', skill_set:'Beceri Seti',
+    total_sessions:'Toplam Görüşme', active_mentors:'Aktif Mentor', ai_sessions:'AI Oturum',
+    technical:'Teknik', activity:'Aktivite', company_info:'Şirket Bilgileri',
+    toast_profile_saved:'Profil kaydedildi ✓', toast_job_posted:'İlan yayınlandı ✓',
+    toast_job_deleted:'İlan silindi.', toast_edit_coming:'Düzenleme yakında eklenecek.',
+  },
+  en:{
+    portal_fullname:'Alumni Connect Platform',
+    portal_hero_title:'<span style="background:linear-gradient(135deg,#6c63ff,#8b85ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">Shape</span> your career,<br>connect with alumni.',
+    portal_hero_sub:'AI-powered matching finds the best mentors, job listings, and career guidance for you.',
+    stat_alumni:'Active Alumni', stat_companies:'Companies', stat_match:'Match Success',
+    badge_ai:'AI Powered', badge_global:'Global Network', badge_mentor:'Mentorship', badge_rnu:'RNU Platform',
+    ptype_student:'Student / Alumni', ptype_company:'Company',
+    ptab_login:'Sign In', ptab_register:'Register',
+    login_title:'Welcome back', login_sub:'Sign in to your account',
+    register_title:'Create account', register_sub:'Join the ALCOP community',
+    label_email:'Email', label_password:'Password', label_fullname:'Full Name',
+    label_dept:'Department', label_type:'Type', label_company_name:'Company Name',
+    label_sector:'Sector', label_year:'Year / Class', label_uni:'University',
+    label_city:'City', label_goal:'Career Goal', label_skills:'Skills',
+    label_website:'Website', label_location:'Location', label_salary:'Salary Range',
+    label_job_title:'Position Title', label_job_type:'Job Type',
+    label_description:'Description', label_requirements:'Requirements',
+    label_cover:'Cover Letter', label_cv_link:'CV Link', label_company_account:'Company Account',
+    ph_email:'example@university.edu', ph_fullname:'John Smith',
+    ph_dept:'Computer Engineering', ph_sector:'E-commerce / Technology',
+    ph_job_search:'Search jobs...', ph_dept_eng:'Engineering',
+    ph_cover:'Why are you a good fit for this role?',
+    ph_cand_search:'Search candidates...',
+    opt_student:'Student', opt_alumni:'Alumni',
+    opt_fulltime:'Full Time', opt_intern:'Internship', opt_remote:'Remote',
+    btn_login:'Sign In', btn_register:'Register',
+    or_demo:'or try with demo',
+    demo_student:'Student Demo', demo_company:'Company Demo',
+    err_fill:'Please fill in all fields.',
+    nav_explore:'Explore', nav_jobs:'Jobs', nav_ai:'ALCOP AI',
+    nav_messages:'Messages', nav_profile:'Profile',
+    company_badge:'COMPANY',
+    hero_badge:'AI-Powered Career Platform',
+    hero_title:'<em>Shape</em> your career,<br>connect with alumni.',
+    hero_sub:'AI-powered matching finds the most suitable mentors for you. Real career advice, real connections.',
+    hero_btn1:'Plan with ALCOP AI', hero_btn2:'Browse Jobs',
+    stat1:'Active Alumni', stat2:'Match Success Rate', stat3:'Partner Companies', stat4:'Countries',
+    suggested_alumni:'Recommended Alumni for You',
+    match_label:'match', send_msg:'Send Message',
+    filter_all:'All', filter_fulltime:'Full Time', filter_intern:'Internship', filter_remote:'Remote',
+    filter_all_skills:'All Skills', filter_all_status:'All Statuses', filter_all_match:'All Matches',
+    filter_match_90:'90%+', filter_match_80:'80%+', filter_match_70:'70%+',
+    badge_new:'New', job_select_prompt:'Select a job posting',
+    btn_apply_now:'Apply Now', btn_contact_company:'Contact Company',
+    job_desc_title:'Job Description', job_reqs_title:'Requirements',
+    job_poster_title:'Posted by Alumni', poster_alumni_label:'Alumni Employee',
+    cds_active:'Active Listings', cds_apps:'Applications', cds_msgs:'Messages', cds_alumni:'Alumni',
+    my_postings:'My Postings', btn_post_job:'+ New Listing',
+    candidate_title:'Candidate Pool',
+    status_new_opt:'New', status_review_opt:'In Review',
+    btn_edit:'Edit', btn_delete:'Delete',
+    modal_edit_title:'Edit Profile', modal_post_job:'Create New Listing',
+    modal_apply:'Apply', btn_apply:'Submit Application',
+    btn_cancel:'Cancel', btn_save:'Save', btn_close:'Close',
+    apply_success_title:'Application Received!',
+    apply_success_sub:'The company will get back to you shortly.',
+    apply_auto_msg:'We received your application and will respond soon.',
+    ai_sidebar_sub:'Powered by Gemini',
+    mode_mentor_title:'Mentor Matching', mode_mentor_sub:'Find your best mentor',
+    mode_roadmap_title:'Career Roadmap', mode_roadmap_sub:'Step-by-step to your goal',
+    mode_cv_title:'CV Analysis', mode_cv_sub:'Strengthen your CV',
+    mode_salary_title:'Salary Guide', mode_salary_sub:'Industry salary insights',
+    mode_interview_title:'Interview Prep', mode_interview_sub:'Questions & techniques',
+    mode_sector_title:'Sector Analysis', mode_sector_sub:'Trends & opportunities',
+    chat_header_sub:'ALCOP AI — Powered by Gemini',
+    ai_online:'Online',
+    qp1:'Plan software career', qp1_msg:'Create a career plan for the software industry',
+    qp2:'Recommend mentor', qp2_msg:'Recommend a suitable mentor for me',
+    qp3:'Strengthen CV', qp3_msg:'How can I strengthen my CV?',
+    qp4:'Industry trends', qp4_msg:'What are the job market trends in 2025?',
+    chat_placeholder:'Type your question...',
+    greeting:"Hello! 👋 I'm ALCOP AI, your career assistant.",
+    greeting2:"I'm here for mentor matching, career roadmaps, CV analysis and more.",
+    greeting3:'How can I help you?',
+    mode_changed:'Mode changed', mode_help:'How can I help you with this topic?',
+    error_conn:'Connection error. Please try again.', error_generic:'An error occurred.',
+    messages_title:'Messages', select_conv:'Select a conversation',
+    gemini_powered:'Powered by Gemini AI',
+    online:'Online', dm_placeholder:'Write a message...',
+    dm_intro:"Hi! I'd be happy to help you on your career journey.",
+    now:'Now',
+    edit_profile:'Edit Profile', edit:'Edit',
+    personal_info:'Personal Information', career_goals:'Career Goals',
+    mentor_activity:'Mentor Activity', skill_set:'Skill Set',
+    total_sessions:'Total Sessions', active_mentors:'Active Mentors', ai_sessions:'AI Sessions',
+    technical:'Technical', activity:'Activity', company_info:'Company Information',
+    toast_profile_saved:'Profile saved ✓', toast_job_posted:'Job posted ✓',
+    toast_job_deleted:'Job deleted.', toast_edit_coming:'Edit feature coming soon.',
+  }
+};
+
+function t(key){return i18n[currentLang][key]||i18n.tr[key]||key;}
+
+function setLang(lang){
+  currentLang=lang;
+  document.getElementById('btn-tr').classList.toggle('active',lang==='tr');
+  document.getElementById('btn-en').classList.toggle('active',lang==='en');
+  document.documentElement.lang=lang;
+  applyI18n();
+  if(currentUser){
+    renderAlumni();
+    renderConversations();
+    renderProfile();
+    renderJobsView();
+    const chatMsgs=document.getElementById('chatMessages');
+    if(chatMsgs&&chatMsgs.children.length===1){
+      chatMsgs.innerHTML=`<div class="msg ai"><div class="msg-av msg-ai-av">✦</div><div class="msg-bubble"><p>${t('greeting')}</p><p>${t('greeting2')}</p><p>${t('greeting3')}</p></div></div>`;
+    }
+    if(activeConv) openConv(activeConv);
+  }
+}
+
+function applyI18n(){
+  document.querySelectorAll('[data-i18n]').forEach(el=>{const k=el.getAttribute('data-i18n');if(i18n[currentLang][k]!==undefined)el.textContent=i18n[currentLang][k];});
+  document.querySelectorAll('[data-i18n-html]').forEach(el=>{const k=el.getAttribute('data-i18n-html');if(i18n[currentLang][k]!==undefined)el.innerHTML=i18n[currentLang][k];});
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(el=>{const k=el.getAttribute('data-i18n-placeholder');if(i18n[currentLang][k]!==undefined)el.placeholder=i18n[currentLang][k];});
+}
+
+// init portal i18n
+applyI18n();
+</script>
+</body>
+</html>
