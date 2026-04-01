@@ -19,22 +19,17 @@ AlumniConnect aims to bridge the gap between education and industry by creating 
 
 ## Tech Stack
 
-*(Fill this part with your technologies, for example:)*  
-- Frontend: React / Next.js  
-- Backend: Node.js / Express  
-- Database: PostgreSQL / MongoDB  
+- Frontend: HTML / CSS
+- Backend: Pyhton / Java
+- Database: PostgreSQL / MongoDB
 
 ## Future Plans
 
-- AI-powered job recommendations  
-- Mentorship matching system  
-- Event and webinar management  
-- Mobile application  
+- AI-powered job recommendations
+- Mentorship matching system
+- Event and webinar management
+- Mobile application
 
 ## Contributing
 
 Contributions are welcome! Feel free to open issues or submit pull requests.
-
-## License
-
-This project is licensed under the MIT License.
