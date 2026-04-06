@@ -1003,44 +1003,55 @@ footer a{color:var(--accent2);text-decoration:none}
 const WORKER_URL = 'https://alcop-ai.chaosreus.workers.dev';
 
 async function geminiCall(payload) {
-  // Sistem talimatını mesajın içine enjekte et (En garanti yol)
-  const systemPrompt = "Sen ALCOP AI isimli bir kariyer asistanısın. Samimi ve profesyonel ol.";
-  
-  // Mesaj geçmişinin başına sistem talimatını ekle
-  const contents = [
-    {
-      role: "user",
-      parts: [{ text: `TALİMAT: ${systemPrompt}\n\nSoru: ${payload.contents[payload.contents.length-1].parts[0].text}` }]
-    }
-  ];
-
-  // Google'ın istediği en saf veri yapısı
-  const cleanBody = {
-    contents: contents,
-    generationConfig: {
-      maxOutputTokens: 800,
-      temperature: 0.7
-    }
-  };
-
   try {
     const resp = await fetch(WORKER_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(cleanBody)
+      body: JSON.stringify(payload)
     });
 
     const result = await resp.json();
-
-    if (!resp.ok) {
-      console.error("API Hatası:", result);
-      throw new Error(result.error?.message || "Bir hata oluştu");
-    }
-
+    if (!resp.ok) throw new Error(result.error || 'İstek başarısız');
     return result;
   } catch(e) {
-    console.error('Bağlantı Hatası:', e);
+    console.error('Hata:', e);
     throw e;
+  }
+}
+
+// Mesaj gönderme işlemini başlatan fonksiyon
+async function sendMessage() {
+  if (isLoading) return;
+  const input = document.getElementById('chatInput');
+  const text = input.value.trim();
+  if (!text) return;
+
+  input.value = '';
+  addUserMsg(text);
+
+  isLoading = true;
+  document.getElementById('sendBtn').disabled = true;
+  const typId = addTyping();
+
+  try {
+    const data = await geminiCall({
+      contents: [{ role: 'user', parts: [{ text: text }] }]
+    });
+
+    removeTyping(typId);
+
+    // DÜZELTME: Cloudflare AI yanıtı 'response' olarak döner
+    if (data.response) {
+      addAIMsg(data.response);
+    } else {
+      throw new Error("AI yanıt veremedi.");
+    }
+  } catch (err) {
+    removeTyping(typId);
+    addAIMsg("Hata: " + err.message);
+  } finally {
+    isLoading = false;
+    document.getElementById('sendBtn').disabled = false;
   }
 }
 
