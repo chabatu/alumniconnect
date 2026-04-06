@@ -1795,40 +1795,44 @@ async function sendMessage() {
   const text = input.value.trim();
   if (!text) return;
 
-  // Ekranı hazırla
+  // 1. Kullanıcı mesajını ekrana bas
   input.value = '';
   input.style.height = 'auto';
   addUserMsg(text);
 
+  // 2. Bekleme durumuna geç
   isLoading = true;
   document.getElementById('sendBtn').disabled = true;
   const typId = addTyping();
 
   try {
-    // Mesajı gönder
+    // 3. Worker'a isteği gönder
     const data = await geminiCall({
       contents: [{ role: 'user', parts: [{ text: text }] }]
     });
 
+    // 4. Yazıyor... efektini kaldır
     removeTyping(typId);
 
-    // DÜZELTME: Cloudflare'den gelen 'response' alanını kontrol et
+    // 5. KRİTİK NOKTA: Cloudflare'den gelen veriyi oku
+    // Network'te gördüğün "response" alanını alıyoruz
     if (data && data.response) {
       const reply = data.response;
       
-      // Geçmişe ekle (Opsiyonel)
+      // Sohbet geçmişine ekle
       chatHistory.push({ role: 'user', parts: [{ text: text }] });
       chatHistory.push({ role: 'model', parts: [{ text: reply }] });
       
-      addAIMsg(reply); // Ekrana yapay zekanın cevabını basar!
+      // YAPAY ZEKA CEVABINI EKRANA BAS!
+      addAIMsg(reply); 
     } else {
-      console.error("Gelen veri yapısı farklı:", data);
-      throw new Error("Yanıt formatı geçersiz.");
+      console.error("Gelen veri yapısı beklenen gibi değil:", data);
+      throw new Error("Yanıt formatı geçersiz (response alanı bulunamadı).");
     }
 
   } catch (err) {
     removeTyping(typId);
-    console.error('Hata detayı:', err);
+    console.error('Hata Detayı:', err);
     addAIMsg("Sistemde bir aksaklık oldu: " + err.message);
   } finally {
     isLoading = false;
