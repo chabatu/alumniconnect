@@ -1795,47 +1795,47 @@ async function sendMessage() {
   const text = input.value.trim();
   if (!text) return;
 
-  // 1. Kullanıcı mesajını temizle ve ekrana ekle
+  // 1. Kullanıcı mesajını ekrana bas
   input.value = '';
   input.style.height = 'auto';
   addUserMsg(text);
 
-  // 2. Bekleme durumunu başlat
+  // 2. Hazırlık yap
   isLoading = true;
   document.getElementById('sendBtn').disabled = true;
   const typId = addTyping();
 
   try {
-    // 3. Worker'a isteği gönder (Cloudflare AI formatında)
+    // 3. Worker'a gönder (Basit formatta)
     const data = await geminiCall({
       contents: [{ role: 'user', parts: [{ text: text }] }]
     });
 
-    // 4. "Yazıyor..." animasyonunu kaldır
+    // 4. "Yazıyor..." efektini kaldır
     removeTyping(typId);
 
-    // 5. CEVABI KONTROL ET VE EKRANA BAS
-    // Cloudflare AI'dan gelen veri 'data.response' içindedir
+    // 5. CEVABI KONTROL ET VE EKRANA YAZDIR
+    // ÖNEMLİ: Burada artık candidates[0] aramıyoruz!
     if (data && data.response) {
-      const aiReply = data.response;
+      const aiReply = data.response; // Network tabında gördüğün metin burada
       
-      // Sohbet geçmişini güncelle (AI'nın hatırlaması için)
+      // Geçmişe ekle (AI'nın hatırlaması için)
       chatHistory.push({ role: 'user', parts: [{ text: text }] });
       chatHistory.push({ role: 'model', parts: [{ text: aiReply }] });
       
-      // İŞTE BURASI: Mesajı baloncuğa yazdırır
+      // MESAJI EKRANA BASAN ASIL KOMUT:
       addAIMsg(aiReply); 
       
-    } else if (data && data.error) {
-      throw new Error(data.error);
     } else {
-      throw new Error("Yanıt formatı tanınamadı.");
+      // Eğer response gelmediyse ne geldiğini konsola yazdır
+      console.error("Gelen veri yapısı hatalı:", data);
+      throw new Error("AI yanıt veremedi, veri boş geldi.");
     }
 
   } catch (err) {
     removeTyping(typId);
-    console.error('Mesaj Hatası:', err);
-    addAIMsg("Üzgünüm, bir sorun oluştu: " + err.message);
+    console.error('SendMessage Patladı:', err);
+    addAIMsg("Hata: " + err.message);
   } finally {
     isLoading = false;
     document.getElementById('sendBtn').disabled = false;
