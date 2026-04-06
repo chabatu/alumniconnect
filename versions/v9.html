@@ -1003,23 +1003,22 @@ footer a{color:var(--accent2);text-decoration:none}
 const WORKER_URL = 'https://alcop-ai.chaosreus.workers.dev';
 
 async function geminiCall(payload) {
-  // SİSTEM TALİMATINI MESAJ GEÇMİŞİNİN BAŞINA EKLE
-  // Böylece API'nin 'system_instruction' alanını desteklemesine gerek kalmaz.
-  const systemPrompt = payload.system_instruction.parts[0].text;
+  // Sistem talimatını mesajın içine enjekte et (En garanti yol)
+  const systemPrompt = "Sen ALCOP AI isimli bir kariyer asistanısın. Samimi ve profesyonel ol.";
   
-  const fullHistory = [
-    { role: 'user', parts: [{ text: `TALİMATLAR: ${systemPrompt}\n\nBu talimatları anladın mı?` }] },
-    { role: 'model', parts: [{ text: "Anladım. ALCOP AI olarak bu talimatlar doğrultusunda yardımcı olacağım." }] },
-    ...payload.contents.map(msg => ({
-      role: msg.role === 'assistant' ? 'model' : msg.role,
-      parts: msg.parts
-    }))
+  // Mesaj geçmişinin başına sistem talimatını ekle
+  const contents = [
+    {
+      role: "user",
+      parts: [{ text: `TALİMAT: ${systemPrompt}\n\nSoru: ${payload.contents[payload.contents.length-1].parts[0].text}` }]
+    }
   ];
 
+  // Google'ın istediği en saf veri yapısı
   const cleanBody = {
-    contents: fullHistory,
+    contents: contents,
     generationConfig: {
-      maxOutputTokens: 1000,
+      maxOutputTokens: 800,
       temperature: 0.7
     }
   };
@@ -1032,10 +1031,15 @@ async function geminiCall(payload) {
     });
 
     const result = await resp.json();
-    if (!resp.ok) throw new Error(result.error?.message || 'AI Hatası');
+
+    if (!resp.ok) {
+      console.error("API Hatası:", result);
+      throw new Error(result.error?.message || "Bir hata oluştu");
+    }
+
     return result;
   } catch(e) {
-    console.error('Hata:', e);
+    console.error('Bağlantı Hatası:', e);
     throw e;
   }
 }
