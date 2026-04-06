@@ -1795,45 +1795,47 @@ async function sendMessage() {
   const text = input.value.trim();
   if (!text) return;
 
-  // 1. Kullanıcı mesajını ekrana bas
+  // 1. Kullanıcı mesajını temizle ve ekrana ekle
   input.value = '';
   input.style.height = 'auto';
   addUserMsg(text);
 
-  // 2. Bekleme durumuna geç
+  // 2. Bekleme durumunu başlat
   isLoading = true;
   document.getElementById('sendBtn').disabled = true;
   const typId = addTyping();
 
   try {
-    // 3. Worker'a isteği gönder
+    // 3. Worker'a isteği gönder (Cloudflare AI formatında)
     const data = await geminiCall({
       contents: [{ role: 'user', parts: [{ text: text }] }]
     });
 
-    // 4. Yazıyor... efektini kaldır
+    // 4. "Yazıyor..." animasyonunu kaldır
     removeTyping(typId);
 
-    // 5. KRİTİK NOKTA: Cloudflare'den gelen veriyi oku
-    // Network'te gördüğün "response" alanını alıyoruz
+    // 5. CEVABI KONTROL ET VE EKRANA BAS
+    // Cloudflare AI'dan gelen veri 'data.response' içindedir
     if (data && data.response) {
-      const reply = data.response;
+      const aiReply = data.response;
       
-      // Sohbet geçmişine ekle
+      // Sohbet geçmişini güncelle (AI'nın hatırlaması için)
       chatHistory.push({ role: 'user', parts: [{ text: text }] });
-      chatHistory.push({ role: 'model', parts: [{ text: reply }] });
+      chatHistory.push({ role: 'model', parts: [{ text: aiReply }] });
       
-      // YAPAY ZEKA CEVABINI EKRANA BAS!
-      addAIMsg(reply); 
+      // İŞTE BURASI: Mesajı baloncuğa yazdırır
+      addAIMsg(aiReply); 
+      
+    } else if (data && data.error) {
+      throw new Error(data.error);
     } else {
-      console.error("Gelen veri yapısı beklenen gibi değil:", data);
-      throw new Error("Yanıt formatı geçersiz (response alanı bulunamadı).");
+      throw new Error("Yanıt formatı tanınamadı.");
     }
 
   } catch (err) {
     removeTyping(typId);
-    console.error('Hata Detayı:', err);
-    addAIMsg("Sistemde bir aksaklık oldu: " + err.message);
+    console.error('Mesaj Hatası:', err);
+    addAIMsg("Üzgünüm, bir sorun oluştu: " + err.message);
   } finally {
     isLoading = false;
     document.getElementById('sendBtn').disabled = false;
