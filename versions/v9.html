@@ -1011,47 +1011,15 @@ async function geminiCall(payload) {
     });
 
     const result = await resp.json();
-    if (!resp.ok) throw new Error(result.error || 'İstek başarısız');
+
+    if (!resp.ok) {
+      throw new Error(result.error || 'Worker Hatası');
+    }
+
     return result;
   } catch(e) {
-    console.error('Hata:', e);
+    console.error('AI error:', e);
     throw e;
-  }
-}
-
-// Mesaj gönderme işlemini başlatan fonksiyon
-async function sendMessage() {
-  if (isLoading) return;
-  const input = document.getElementById('chatInput');
-  const text = input.value.trim();
-  if (!text) return;
-
-  input.value = '';
-  addUserMsg(text);
-
-  isLoading = true;
-  document.getElementById('sendBtn').disabled = true;
-  const typId = addTyping();
-
-  try {
-    const data = await geminiCall({
-      contents: [{ role: 'user', parts: [{ text: text }] }]
-    });
-
-    removeTyping(typId);
-
-    // DÜZELTME: Cloudflare AI yanıtı 'response' olarak döner
-    if (data.response) {
-      addAIMsg(data.response);
-    } else {
-      throw new Error("AI yanıt veremedi.");
-    }
-  } catch (err) {
-    removeTyping(typId);
-    addAIMsg("Hata: " + err.message);
-  } finally {
-    isLoading = false;
-    document.getElementById('sendBtn').disabled = false;
   }
 }
 
@@ -1822,35 +1790,50 @@ function handleKey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMe
 function autoResize(el){el.style.height='auto';el.style.height=Math.min(el.scrollHeight,120)+'px';}
 
 async function sendMessage() {
-  if(isLoading)return;
-  const input=document.getElementById('chatInput');
-  const text=input.value.trim();
-  if(!text)return;
-  input.value='';input.style.height='auto';
+  if (isLoading) return;
+  const input = document.getElementById('chatInput');
+  const text = input.value.trim();
+  if (!text) return;
+
+  // Ekranı hazırla
+  input.value = '';
+  input.style.height = 'auto';
   addUserMsg(text);
-  chatHistory.push({role:'user',parts:[{text}]});
-  isLoading=true;
-  document.getElementById('sendBtn').disabled=true;
-  const typId=addTyping();
+
+  isLoading = true;
+  document.getElementById('sendBtn').disabled = true;
+  const typId = addTyping();
 
   try {
-    const sysInstruction=modeConfig[currentMode].sys;
+    // Mesajı gönder
     const data = await geminiCall({
-      system_instruction:{parts:[{text:sysInstruction}]},
-      contents:chatHistory,
-      generationConfig:{maxOutputTokens:1000,temperature:0.8}
+      contents: [{ role: 'user', parts: [{ text: text }] }]
     });
+
     removeTyping(typId);
-    const reply=data.candidates?.[0]?.content?.parts?.[0]?.text||t('error_generic');
-    chatHistory.push({role:'model',parts:[{text:reply}]});
-    addAIMsg(reply);
-  } catch(err) {
+
+    // DÜZELTME: Cloudflare'den gelen 'response' alanını kontrol et
+    if (data && data.response) {
+      const reply = data.response;
+      
+      // Geçmişe ekle (Opsiyonel)
+      chatHistory.push({ role: 'user', parts: [{ text: text }] });
+      chatHistory.push({ role: 'model', parts: [{ text: reply }] });
+      
+      addAIMsg(reply); // Ekrana yapay zekanın cevabını basar!
+    } else {
+      console.error("Gelen veri yapısı farklı:", data);
+      throw new Error("Yanıt formatı geçersiz.");
+    }
+
+  } catch (err) {
     removeTyping(typId);
-    console.error('AI chat error:', err);
-    addAIMsg(t('error_conn'));
+    console.error('Hata detayı:', err);
+    addAIMsg("Sistemde bir aksaklık oldu: " + err.message);
+  } finally {
+    isLoading = false;
+    document.getElementById('sendBtn').disabled = false;
   }
-  isLoading=false;
-  document.getElementById('sendBtn').disabled=false;
 }
 
 function addUserMsg(text){
